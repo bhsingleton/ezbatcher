@@ -134,6 +134,8 @@ class QEzBatcher(quicwindow.QUicWindow):
         # Initialize explorer item model
         #
         self.explorerItemModel = qfileexploreritemmodel.QFileExplorerItemModel(parent=self)
+        self.explorerItemModel.setObjectName('explorerItemModel')
+
         self.cwdLineEdit.textChanged.connect(self.explorerItemModel.setCwd)
         self.cwdLineEdit.setText(self.scene.currentProjectDirectory())
 
@@ -142,6 +144,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         # Initialize queue item model
         #
         self.queueItemModel = qfileitemmodel.QFileItemModel(parent=self)
+        self.queueItemModel.setObjectName('queueItemModel')
 
         self.queueTableView.setModel(self.queueItemModel)
         self.queueTableView.installEventFilter(self)
@@ -149,6 +152,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         # Initialize task item model
         #
         self.taskItemModel = qpsonitemmodel.QPSONItemModel(parent=self)
+        self.taskItemModel.setObjectName('taskItemModel')
         self.taskItemModel.invisibleRootItem = self.taskManager
         self.taskItemModel.invisibleRootProperty = 'tasks'
 
@@ -191,7 +195,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         If you want to filter the event out, i.e. stop it being handled further, return true; otherwise return false.
 
         :type watched: QtWidgets.QWidget
-        :type event: int
+        :type event: QtCore.QEvent
         :rtype: bool
         """
 
@@ -392,7 +396,7 @@ class QEzBatcher(quicwindow.QUicWindow):
             parent=self,
             caption='Save As',
             dir=self.cwd(),
-            filter='JSON (*.json)'
+            filter='JSON files (*.json)'
         )
 
         # Check if path is valid
