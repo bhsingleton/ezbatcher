@@ -2,7 +2,7 @@ import os
 
 from dcc import fnscene
 from dcc.python import stringutils
-from ..libs import abstracttask
+from .abstract import abstracttask
 
 import logging
 logging.basicConfig()

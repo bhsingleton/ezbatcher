@@ -1,5 +1,5 @@
 from dcc import fnnode
-from ..libs import abstracttask
+from .abstract import abstracttask
 
 import logging
 logging.basicConfig()

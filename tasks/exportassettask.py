@@ -7,14 +7,14 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 
-class ExportAnimationTask(abstracttask.AbstractTask):
+class ExportAssetTask(abstracttask.AbstractTask):
     """
     Overload of AbstractTask that exports animation from the scene file.
     """
 
     # region Dunderscores
     __slots__ = ('_manager',)
-    __title__ = 'Export Animations'
+    __title__ = 'Export Assets'
 
     def __init__(self, *args, **kwargs):
         """
@@ -29,7 +29,8 @@ class ExportAnimationTask(abstracttask.AbstractTask):
 
         # Call parent method
         #
-        super(ExportAnimationTask, self).__init__(*args, **kwargs)
+        super(ExportAssetTask, self).__init__(*args, **kwargs)
+
     # endregion
 
     # region Properties
@@ -42,6 +43,7 @@ class ExportAnimationTask(abstracttask.AbstractTask):
         """
 
         return self._manager
+
     # endregion
 
     # region Methods
@@ -52,15 +54,11 @@ class ExportAnimationTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        # Iterate through sequencers
+        # Iterate through export sets
         #
-        sequencers = self.manager.loadSequencers()
+        asset = self.manager.loadAsset()
 
-        for sequencer in sequencers:
+        for exportSet in asset.exportSets:
 
-            # Iterate through sequences
-            #
-            for sequence in sequencer.sequences:
-
-                sequence.export()
+            exportSet.export()
     # endregion

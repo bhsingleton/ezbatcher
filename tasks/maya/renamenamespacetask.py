@@ -1,5 +1,6 @@
 from maya import cmds
-from ezbatcher.libs import DCC, abstracttask
+from ..abstract import abstracttask
+from ...libs import DCC
 
 import logging
 logging.basicConfig()

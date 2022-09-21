@@ -1,6 +1,6 @@
 from enum import IntEnum
 from dcc.python import stringutils
-from ..libs import abstracttask
+from .abstract import abstracttask
 
 import logging
 logging.basicConfig()

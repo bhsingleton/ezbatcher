@@ -1,7 +1,6 @@
-import os
-
-from airship_syndicate.maxtomaya.libs import exportutils
-from ezbatcher.libs import DCC, abstracttask
+from airship_syndicate.maxtomaya import exportutils
+from ..abstract import abstracttask
+from ...libs import DCC
 
 import logging
 logging.basicConfig()
@@ -67,5 +66,11 @@ class ExportMXSONTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        pass
+        if self.animationOnly:
+
+            exportutils.exportAnimation()
+
+        else:
+
+            exportutils.exportScene()
     # endregion

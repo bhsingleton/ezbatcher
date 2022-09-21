@@ -1,5 +1,5 @@
 from dcc.maya.libs import sceneutils
-from ...libs import DCC, abstracttask
+from ..abstract import abstracttask
 
 import logging
 logging.basicConfig()
