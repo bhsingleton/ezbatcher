@@ -4,7 +4,8 @@ import weakref
 from dcc import fnscene
 from dcc.collections import notifylist
 from dcc.json import psonobject
-from . import abstracttask, taskfactory
+from . import taskfactory
+from ..tasks.abstract import abstracttask
 
 import logging
 logging.basicConfig()
@@ -15,10 +16,15 @@ log.setLevel(logging.INFO)
 class TaskManager(psonobject.PSONObject):
     """
     Overload of PSONObject that acts as a collection of executable tasks.
+    The execution logic works as follows:
+    The internal tasks are applied to each file in the queue.
+    For each task executed the results of that task are passed onto the next task as arguments.
+    The first task will receive the current file path being processed as an argument.
+    Each task will also receive the manager instance in the form of a 'taskManager' keyword argument.
     """
 
     # region Dunderscores
-    __slots__ = ('__weakref__', '_scene', '_tasks', '_factory')
+    __slots__ = ('__weakref__', '_scene', '_tasks', '_factory', '_currentTask', '_currentFile')
 
     def __init__(self, *args, **kwargs):
         """
@@ -32,6 +38,8 @@ class TaskManager(psonobject.PSONObject):
         self._scene = fnscene.FnScene()
         self._tasks = notifylist.NotifyList()
         self._factory = taskfactory.TaskFactory.getInstance(asWeakReference=True)
+        self._currentTask = None
+        self._currentFile = None
 
         # Setup notifies
         #
@@ -85,6 +93,25 @@ class TaskManager(psonobject.PSONObject):
 
         self._tasks.clear()
         self._tasks.extend(tasks)
+
+    @property
+    def currentTask(self):
+        """
+        Getter method that returns the current task.
+
+        :rtype: abstracttask.AbstractTask
+        """
+
+        return self._currentTask
+
+    @property
+    def currentFile(self):
+        """
+        Getter method that returns the current file.
+
+        :rtype: str
+        """
+        return self._currentFile
     # endregion
 
     # region Methods
@@ -98,29 +125,27 @@ class TaskManager(psonobject.PSONObject):
 
         # Iterate through files
         #
+        results = None
+
         for filePath in filePaths:
 
             # Check if scene file exists
             #
-            if not os.path.exists(filePath):
+            self._currentFile = filePath
 
-                log.warning('Cannot locate scene file: %s' % filePath)
-                continue
+            if not os.path.exists(self._currentFile):
 
-            # Try and open scene file
-            #
-            success = self.scene.open(filePath)
-
-            if not success:
-
-                log.warning('Cannot open scene file: %s' % filePath)
+                log.warning('Cannot locate file: %s' % self._currentFile)
                 continue
 
             # Execute tasks
             #
+            results = self._currentFile
+
             for task in self.tasks:
 
-                task.doIt()
+                self._currentTask = task
+                results = self._currentTask.doIt(results, taskManager=self)
     # endregion
 
     # region Callbacks
