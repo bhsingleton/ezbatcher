@@ -1,7 +1,8 @@
-from dcc.abstract import proxyfactory
 from dcc import __application__
-from . import abstracttask
+from dcc.abstract import proxyfactory
 from .. import tasks
+from ..tasks import maya, max
+from ..tasks.abstract import abstracttask
 
 import logging
 logging.basicConfig()
@@ -34,12 +35,10 @@ class TaskFactory(proxyfactory.ProxyFactory):
 
         if __application__ == 'maya':
 
-            from ..tasks import maya
             return tasks, maya
 
         elif __application__ == '3dsmax':
 
-            from ..tasks import max
             return tasks, max
 
         else:
