@@ -1,6 +1,5 @@
 import os
 
-from dcc import fnscene
 from .abstract import abstracttask
 
 import logging
@@ -15,7 +14,7 @@ class OpenSceneTask(abstracttask.AbstractTask):
     """
 
     # region Dunderscores
-    __slots__ = ('_scene', '_filePath', '_reopenCurrentFile')
+    __slots__ = ('_filePath', '_reopenCurrentFile')
     __title__ = 'Open Scene'
 
     def __init__(self, *args, **kwargs):
@@ -27,7 +26,6 @@ class OpenSceneTask(abstracttask.AbstractTask):
 
         # Declare private variables
         #
-        self._scene = fnscene.FnScene()
         self._filePath = kwargs.get('filePath', '')
         self._reopenCurrentFile = kwargs.get('reopenCurrentFile', False)
 
@@ -37,16 +35,6 @@ class OpenSceneTask(abstracttask.AbstractTask):
     # endregion
 
     # region Properties
-    @property
-    def scene(self):
-        """
-        Getter method that returns the scene interface.
-
-        :rtype: fnscene.FnScene
-        """
-
-        return self._scene
-
     @property
     def filePath(self):
         """

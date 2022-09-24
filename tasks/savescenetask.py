@@ -16,7 +16,7 @@ class SaveSceneTask(abstracttask.AbstractTask):
     """
 
     # region Dunderscores
-    __slots__ = ('_scene', '_directory', '_search', '_replace', '_extension')
+    __slots__ = ('_directory', '_search', '_replace', '_extension')
     __title__ = 'Save Scene'
 
     def __init__(self, *args, **kwargs):
@@ -28,7 +28,6 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
         # Declare private variables
         #
-        self._scene = fnscene.FnScene()
         self._directory = kwargs.get('directory', '')
         self._search = kwargs.get('search', '')
         self._replace = kwargs.get('replace', '')
@@ -40,16 +39,6 @@ class SaveSceneTask(abstracttask.AbstractTask):
     # endregion
 
     # region Properties
-    @property
-    def scene(self):
-        """
-        Getter method that returns the scene interface.
-
-        :rtype: fnscene.FnScene
-        """
-
-        return self._scene
-
     @property
     def directory(self):
         """
