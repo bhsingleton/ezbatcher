@@ -12,9 +12,12 @@ class UnloadMentalRayPluginTask(abstracttask.AbstractTask):
     Overload of AbstractTask that unloads the MentalRay plugin from the open scene file.
     """
 
+    # region Dunderscores
     __slots__ = ()
     __title__ = 'Unload MentalRay Plugin'
+    # endregion
 
+    # region Methods
     def doIt(self, *args, **kwargs):
         """
         Executes this task.
@@ -23,3 +26,4 @@ class UnloadMentalRayPluginTask(abstracttask.AbstractTask):
         """
 
         sceneutils.unloadMentalRayPlugin()
+    # endregion

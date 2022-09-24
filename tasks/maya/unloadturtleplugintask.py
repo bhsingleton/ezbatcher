@@ -12,9 +12,12 @@ class UnloadTurtlePluginTask(abstracttask.AbstractTask):
     Overload of AbstractTask that unloads the turtle plugin from the open scene file.
     """
 
+    # region Dunderscores
     __slots__ = ()
     __title__ = 'Unload Turtle Plugin'
+    # endregion
 
+    # region Methods
     def doIt(self, *args, **kwargs):
         """
         Executes this task.
@@ -24,3 +27,4 @@ class UnloadTurtlePluginTask(abstracttask.AbstractTask):
         """
 
         sceneutils.unloadTurtlePlugin()
+    # endregion
