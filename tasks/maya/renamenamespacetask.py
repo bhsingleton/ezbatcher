@@ -1,6 +1,5 @@
 from maya import cmds
 from ..abstract import abstracttask
-from ...libs import DCC
 
 import logging
 logging.basicConfig()
@@ -15,7 +14,6 @@ class RenameNamespaceTask(abstracttask.AbstractTask):
 
     # region Dunderscores
     __slots__ = ()
-    __dcc__ = DCC.Maya
     __title__ = 'Rename Namespace'
 
     def __init__(self, *args, **kwargs):

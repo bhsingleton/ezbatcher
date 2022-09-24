@@ -13,7 +13,6 @@ class UnloadMentalRayPluginTask(abstracttask.AbstractTask):
     """
 
     __slots__ = ()
-    __dcc__ = DCC.Maya
     __title__ = 'Unload MentalRay Plugin'
 
     def doIt(self, *args, **kwargs):

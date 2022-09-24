@@ -3,7 +3,6 @@ from six import with_metaclass
 from dcc import fnscene
 from dcc.json import psonobject
 from dcc.decorators.classproperty import classproperty
-from . import DCC
 
 import logging
 logging.basicConfig()
@@ -18,7 +17,6 @@ class AbstractTask(with_metaclass(ABCMeta, psonobject.PSONObject)):
 
     # region Dunderscores
     __slots__ = ('_manager', '_scene')
-    __dcc__ = DCC.Any  # Controls which programs this task can be executed in
     __title__ = ''
 
     def __init__(self, *args, **kwargs):

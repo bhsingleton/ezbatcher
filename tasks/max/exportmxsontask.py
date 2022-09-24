@@ -1,6 +1,5 @@
 from airship_syndicate.maxtomaya import exportutils
 from ..abstract import abstracttask
-from ...libs import DCC
 
 import logging
 logging.basicConfig()
@@ -15,7 +14,6 @@ class ExportMXSONTask(abstracttask.AbstractTask):
 
     # region Dunderscores
     __slots__ = ('_animationOnly',)
-    __dcc__ = DCC.Max
     __title__ = 'Export MXSON'
 
     def __init__(self, *args, **kwargs):

@@ -13,7 +13,6 @@ class UnloadTurtlePluginTask(abstracttask.AbstractTask):
     """
 
     __slots__ = ()
-    __dcc__ = DCC.Maya
     __title__ = 'Unload Turtle Plugin'
 
     def doIt(self, *args, **kwargs):
