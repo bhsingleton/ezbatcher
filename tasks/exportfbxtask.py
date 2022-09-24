@@ -10,13 +10,13 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 
-class ExportAnimationTask(abstracttask.AbstractTask):
+class ExportFbxTask(abstracttask.AbstractTask):
     """
     Overload of AbstractTask that exports animation from the scene file.
     """
 
     # region Dunderscores
-    __slots__ = ('_manager', '_checkout')
+    __slots__ = ('_manager', '_animationOnly', '_checkout')
     __title__ = 'Export Animations'
 
     def __init__(self, *args, **kwargs):
@@ -29,11 +29,12 @@ class ExportAnimationTask(abstracttask.AbstractTask):
         # Declare private variables
         #
         self._manager = fbxio.FbxIO()
+        self._animationOnly = kwargs.get('animationOnly', True)
         self._checkout = kwargs.get('checkout', False)
 
         # Call parent method
         #
-        super(ExportAnimationTask, self).__init__(*args, **kwargs)
+        super(ExportFbxTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties
@@ -48,9 +49,30 @@ class ExportAnimationTask(abstracttask.AbstractTask):
         return self._manager
 
     @property
+    def animationOnly(self):
+        """
+        Getter method that returns the "animationOnly" flag.
+
+        :rtype: bool
+        """
+
+        return self._animationOnly
+
+    @animationOnly.setter
+    def animationOnly(self, animationOnly):
+        """
+        Setter method that updates the "animationOnly" flag.
+
+        :type animationOnly: bool
+        :rtype: None
+        """
+
+        self._animationOnly = animationOnly
+
+    @property
     def checkout(self):
         """
-        Getter method that returns the checkout flag.
+        Getter method that returns the "checkout" flag.
 
         :rtype: bool
         """
@@ -60,7 +82,7 @@ class ExportAnimationTask(abstracttask.AbstractTask):
     @checkout.setter
     def checkout(self, checkout):
         """
-        Setter method that updates the checkout flag.
+        Setter method that updates the "checkout" flag.
 
         :type checkout: bool
         :rtype: None
@@ -70,9 +92,43 @@ class ExportAnimationTask(abstracttask.AbstractTask):
     # endregion
 
     # region Methods
-    def doIt(self, *args, **kwargs):
+
+    def exportSets(self):
         """
-        Executes this task.
+        Executes all the export sets inside the current scene file.
+
+        :rtype: None
+        """
+
+        # Iterate through export sets
+        #
+        asset = self.manager.loadAsset()
+
+        for exportSet in asset.exportSets:
+
+            # Check if sequence should be checked out
+            #
+            exportPath = exportSet.exportPath()
+
+            requiresAdding = self.checkout and not os.path.exists(exportPath)
+
+            if self.checkout and not requiresAdding:
+
+                cmds.edit(exportPath)
+
+            # Export asset
+            #
+            exportSet.export()
+
+            # Check if sequence should be added
+            #
+            if requiresAdding:
+
+                cmds.add(exportPath)
+
+    def exportSequences(self):
+        """
+        Executes all the sequences inside the current scene file.
 
         :rtype: None
         """
@@ -105,4 +161,19 @@ class ExportAnimationTask(abstracttask.AbstractTask):
                 if requiresAdding:
 
                     cmds.add(exportPath)
+
+    def doIt(self, *args, **kwargs):
+        """
+        Executes this task.
+
+        :rtype: None
+        """
+
+        if self.animationOnly:
+
+            self.exportSequences()
+
+        else:
+
+            self.exportSets()
     # endregion
