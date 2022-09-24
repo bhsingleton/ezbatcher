@@ -1,4 +1,7 @@
+import os
+
 from dcc.fbx.libs import fbxio
+from dcc.perforce import cmds
 from .abstract import abstracttask
 
 import logging
@@ -13,7 +16,7 @@ class ExportAssetTask(abstracttask.AbstractTask):
     """
 
     # region Dunderscores
-    __slots__ = ('_manager',)
+    __slots__ = ('_manager', '_checkout')
     __title__ = 'Export Assets'
 
     def __init__(self, *args, **kwargs):
@@ -26,6 +29,7 @@ class ExportAssetTask(abstracttask.AbstractTask):
         # Declare private variables
         #
         self._manager = fbxio.FbxIO()
+        self._checkout = kwargs.get('checkout', False)
 
         # Call parent method
         #
@@ -44,6 +48,26 @@ class ExportAssetTask(abstracttask.AbstractTask):
 
         return self._manager
 
+    @property
+    def checkout(self):
+        """
+        Getter method that returns the checkout flag.
+
+        :rtype: bool
+        """
+
+        return self._checkout
+
+    @checkout.setter
+    def checkout(self, checkout):
+        """
+        Setter method that updates the checkout flag.
+
+        :type checkout: bool
+        :rtype: None
+        """
+
+        self._checkout = checkout
     # endregion
 
     # region Methods
@@ -60,5 +84,23 @@ class ExportAssetTask(abstracttask.AbstractTask):
 
         for exportSet in asset.exportSets:
 
+            # Check if sequence should be checked out
+            #
+            exportPath = exportSet.exportPath()
+
+            requiresAdding = self.checkout and not os.path.exists(exportPath)
+
+            if self.checkout and not requiresAdding:
+
+                cmds.edit(exportPath)
+
+            # Export asset
+            #
             exportSet.export()
+
+            # Check if sequence should be added
+            #
+            if requiresAdding:
+
+                cmds.add(exportPath)
     # endregion
