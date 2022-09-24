@@ -3,7 +3,6 @@ import webbrowser
 
 from Qt import QtCore, QtWidgets, QtGui
 from dcc import fnscene
-from dcc.perforce import cmds
 from dcc.json import jsonutils
 from dcc.ui import quicwindow
 from dcc.ui.models import qfileitemmodel, qfileexploreritemmodel, qpsonitemmodel, qpsonstyleditemdelegate
@@ -320,6 +319,11 @@ class QEzBatcher(quicwindow.QUicWindow):
         if numTasks > 0:
 
             self.taskItemModel.removeRows(0, numTasks)
+
+    def updateProgressBar(self, filePath='', progress=0.0):
+
+        self.progressBar.setText(filePath)
+        self.progressBar.setValue(progress)
     # endregion
 
     # region Slots
@@ -507,27 +511,21 @@ class QEzBatcher(quicwindow.QUicWindow):
         :rtype: None
         """
 
-        # Iterate through paths
+        # Collect files to process
         #
-        paths = self.queueItemModel.paths()
-        numPaths = len(paths)
+        filePaths = list(map(str, self.queueItemModel.paths()))
+        numFilePaths = len(filePaths)
 
-        for (i, path) in enumerate(paths):
+        if numFilePaths == 0:
 
-            # Check if file should be checked out
-            #
-            filePath = str(path)
+            QtWidgets.QMessageBox.warning()
+            return
 
-            if self.checkoutCheckBox.isChecked():
-
-                cmds.edit(filePath)
-
-            # Execute tasks on file
-            #
-            self.taskManager.execute(filePath)
-
-            # Update progress bar
-            #
-            progress = (float(i) / float(numPaths - 1)) * 100.0
-            self.progressBar.setValue(progress)
+        # Execute tasks
+        #
+        self.taskManager.execute(
+            *filePaths,
+            checkout=self.checkoutCheckBox.isChecked(),
+            callback=self.updateProgressBar
+        )
     # endregion

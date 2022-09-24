@@ -4,6 +4,7 @@ import weakref
 from dcc import fnscene
 from dcc.collections import notifylist
 from dcc.json import psonobject
+from dcc.perforce import cmds
 from . import taskfactory
 from ..tasks.abstract import abstracttask
 
@@ -115,19 +116,23 @@ class TaskManager(psonobject.PSONObject):
     # endregion
 
     # region Methods
-    def execute(self, *filePaths):
+    def execute(self, *filePaths, callback=None, checkout=False):
         """
         Executes the internal tasks on the supplied files.
+        An additional callback can be supplied if an external class requires progress updates.
 
         :type filePaths: Union[str, List[str]]
+        :type checkout: bool
+        :type callback: Callable
         :rtype: None
         """
 
         # Iterate through files
         #
         results = None
+        numFilePaths = len(filePaths)
 
-        for filePath in filePaths:
+        for (i, filePath) in enumerate(filePaths):
 
             # Check if scene file exists
             #
@@ -138,6 +143,12 @@ class TaskManager(psonobject.PSONObject):
                 log.warning('Cannot locate file: %s' % self._currentFile)
                 continue
 
+            # Checkout file
+            #
+            if checkout:
+
+                cmds.edit(filePath)
+
             # Execute tasks
             #
             results = self._currentFile
@@ -146,6 +157,13 @@ class TaskManager(psonobject.PSONObject):
 
                 self._currentTask = task
                 results = self._currentTask.doIt(results, taskManager=self)
+
+            # Evoke callback
+            #
+            if callable(callback):
+
+                progress = (float(i) / float(numFilePaths - 1)) * 100.0
+                callback(filePath=filePath, progress=progress)
     # endregion
 
     # region Callbacks
