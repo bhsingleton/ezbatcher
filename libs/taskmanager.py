@@ -120,6 +120,7 @@ class TaskManager(psonobject.PSONObject):
         """
         Executes the internal tasks on the supplied files.
         An additional callback can be supplied if an external class requires progress updates.
+        This callback should accept a 'filePath' and 'progress' keyword arguments.
 
         :type filePaths: Union[str, List[str]]
         :type checkout: bool
@@ -129,8 +130,8 @@ class TaskManager(psonobject.PSONObject):
 
         # Iterate through files
         #
-        results = None
         numFilePaths = len(filePaths)
+        results = None
 
         for (i, filePath) in enumerate(filePaths):
 
@@ -138,25 +139,31 @@ class TaskManager(psonobject.PSONObject):
             #
             self._currentFile = filePath
 
-            if not os.path.exists(self._currentFile):
+            if not os.path.exists(self.currentFile):
 
-                log.warning('Cannot locate file: %s' % self._currentFile)
+                log.warning('Cannot locate file: %s' % self.currentFile)
                 continue
 
-            # Checkout file
+            # Check if scene can be opened
+            #
+            if self.scene.isValidExtension(self.currentFile):
+
+                self.scene.open(self.currentFile)
+
+            # Check if scene should be checked out
             #
             if checkout:
 
-                cmds.edit(filePath)
+                cmds.edit(self.currentFile)
 
             # Execute tasks
             #
-            results = self._currentFile
+            results = self.currentFile
 
             for task in self.tasks:
 
                 self._currentTask = task
-                results = self._currentTask.doIt(results, taskManager=self)
+                results = self.currentTask.doIt(results, taskManager=self)
 
             # Evoke callback
             #
