@@ -156,6 +156,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         self.taskItemModel.invisibleRootProperty = 'tasks'
 
         self.taskStyledItemDelegate = qpsonstyleditemdelegate.QPSONStyledItemDelegate(parent=self)
+        self.taskStyledItemDelegate.setObjectName('taskStyledItemDelegate')
 
         self.taskTreeView.setModel(self.taskItemModel)
         self.taskTreeView.setItemDelegate(self.taskStyledItemDelegate)
@@ -164,6 +165,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         # Initialize task action group
         #
         self.taskActionGroup = QtWidgets.QActionGroup(self.taskMenu)
+        self.taskActionGroup.setObjectName('taskActionGroup')
         self.taskActionGroup.setExclusive(True)
         self.taskActionGroup.triggered.connect(self.on_taskActionGroup_triggered)
 
@@ -178,7 +180,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         # Add actions to menu
         #
         self.taskMenu = QtWidgets.QMenu(parent=self.addTaskDropDownButton)
-        self.addTaskDropDownButton.setMenu(self.taskMenu)
+        self.taskMenu.setObjectName('taskMenu')
 
         actions = self.taskActionGroup.actions()
         numActions = len(actions)
@@ -187,6 +189,8 @@ class QEzBatcher(quicwindow.QUicWindow):
 
             self.taskMenu.addActions(actions)
             actions[0].trigger()
+
+        self.addTaskDropDownButton.setMenu(self.taskMenu)
 
     def eventFilter(self, watched, event):
         """
