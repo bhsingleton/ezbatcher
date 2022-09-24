@@ -16,7 +16,7 @@ class SaveSceneTask(abstracttask.AbstractTask):
     """
 
     # region Dunderscores
-    __slots__ = ('_directory', '_search', '_replace')
+    __slots__ = ('_scene', '_directory', '_search', '_replace', '_extension')
     __title__ = 'Save Scene'
 
     def __init__(self, *args, **kwargs):
@@ -28,9 +28,11 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
         # Declare private variables
         #
+        self._scene = fnscene.FnScene()
         self._directory = kwargs.get('directory', '')
         self._search = kwargs.get('search', '')
         self._replace = kwargs.get('replace', '')
+        self._extension = kwargs.get('extension', fnscene.FnScene.FileExtensions(0))
 
         # Call parent method
         #
@@ -38,6 +40,16 @@ class SaveSceneTask(abstracttask.AbstractTask):
     # endregion
 
     # region Properties
+    @property
+    def scene(self):
+        """
+        Getter method that returns the scene interface.
+
+        :rtype: fnscene.FnScene
+        """
+
+        return self._scene
+
     @property
     def directory(self):
         """
@@ -100,6 +112,27 @@ class SaveSceneTask(abstracttask.AbstractTask):
         """
 
         self._replace = replace
+
+    @property
+    def extension(self):
+        """
+        Getter method that returns the file extension to save with.
+
+        :rtype: fnscene.FnScene.FileExtensions
+        """
+
+        return self._extension
+
+    @extension.setter
+    def extension(self, extension):
+        """
+        Setter method that updates the file extension to save with.
+
+        :type extension: fnscene.FnScene.FileExtensions
+        :rtype: None
+        """
+
+        self._extension = fnscene.FnScene.FileExtensions(extension)
     # endregion
 
     # region Methods
@@ -112,10 +145,27 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
         # Get directory and filename
         #
-        scene = fnscene.FnScene()
+        directory, filename = '', ''
 
-        directory = scene.currentDirectory()
-        filename = scene.currentFilename()
+        if self.scene.isNewScene():
+
+            # Evaluate file from task manager
+            #
+            taskManager = kwargs.get('taskManager', None)
+
+            directory, filename = os.path.split(taskManager.currentFile)
+            name, extension = os.path.splitext(filename)
+
+            if not self.scene.isValidExtension(extension):
+
+                filename = '{name}.{extension}'.format(name=name, extension=self.extension.name)
+
+        else:
+
+            # Evaluate open scene file
+            #
+            directory = self.scene.currentDirectory()
+            filename = self.scene.currentFilename()
 
         # Check if a search and replace is required
         #
@@ -138,5 +188,5 @@ class SaveSceneTask(abstracttask.AbstractTask):
         # Save changes to file
         #
         log.info('Saving changes to: %s' % filePath)
-        scene.saveAs(filePath)
+        self.scene.saveAs(filePath)
     # endregion
