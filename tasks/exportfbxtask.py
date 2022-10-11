@@ -17,7 +17,7 @@ class ExportFbxTask(abstracttask.AbstractTask):
 
     # region Dunderscores
     __slots__ = ('_manager', '_animationOnly', '_checkout')
-    __title__ = 'Export Animations'
+    __title__ = 'Export Fbx'
 
     def __init__(self, *args, **kwargs):
         """
