@@ -10,6 +10,12 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>500</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>EzBatcher</string>
   </property>
@@ -44,6 +50,22 @@
          <number>0</number>
         </property>
         <item>
+         <widget class="QDirectoryEdit" name="cwdLineEdit">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QSplitter" name="filesSplitter">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -75,69 +97,25 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QWidget" name="cwdWidget" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QLineEdit" name="cwdLineEdit">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>24</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>24</height>
-                  </size>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="cwdPushButton">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>24</width>
-                   <height>24</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>24</width>
-                   <height>24</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="D:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
-                   <normaloff>:/dcc/icons/open_folder.svg</normaloff>:/dcc/icons/open_folder.svg</iconset>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+             <widget class="QLineEdit" name="explorerFilterLineEdit">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="placeholderText">
+               <string>Filter Files (ex. *.txt)</string>
+              </property>
+              <property name="clearButtonEnabled">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -221,6 +199,9 @@
               </property>
               <property name="horizontalScrollBarPolicy">
                <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
               </property>
               <property name="dragEnabled">
                <bool>true</bool>
@@ -358,6 +339,9 @@
                <height>24</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>Adds the specified task to the end of the list.</string>
+             </property>
              <property name="text">
               <string>Add</string>
              </property>
@@ -383,6 +367,9 @@
                <height>24</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>Removes the selected tasks from the list.</string>
+             </property>
              <property name="text">
               <string>Remove</string>
              </property>
@@ -396,13 +383,34 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>40</width>
-               <height>20</height>
+               <height>24</height>
               </size>
              </property>
             </spacer>
            </item>
            <item>
             <widget class="QCheckBox" name="checkoutCheckBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Checks out the processed files from perforce.</string>
+             </property>
              <property name="text">
               <string>Checkout</string>
              </property>
@@ -427,6 +435,9 @@
                <width>16777215</width>
                <height>24</height>
               </size>
+             </property>
+             <property name="toolTip">
+              <string>Executes the task list on the current file queue.</string>
              </property>
              <property name="text">
               <string>Batch</string>
@@ -502,7 +513,7 @@
   </action>
   <action name="saveAction">
    <property name="icon">
-    <iconset resource="D:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
+    <iconset resource="E:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
      <normaloff>:/dcc/icons/save_file.svg</normaloff>:/dcc/icons/save_file.svg</iconset>
    </property>
    <property name="text">
@@ -516,7 +527,7 @@
   </action>
   <action name="openAction">
    <property name="icon">
-    <iconset resource="D:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
+    <iconset resource="E:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
      <normaloff>:/dcc/icons/open_folder.svg</normaloff>:/dcc/icons/open_folder.svg</iconset>
    </property>
    <property name="text">
@@ -525,7 +536,7 @@
   </action>
   <action name="newAction">
    <property name="icon">
-    <iconset resource="D:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
+    <iconset resource="E:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
      <normaloff>:/dcc/icons/new_file.svg</normaloff>:/dcc/icons/new_file.svg</iconset>
    </property>
    <property name="text">
@@ -539,9 +550,14 @@
    <extends>QPushButton</extends>
    <header>dcc/ui/qdropdownbutton.h</header>
   </customwidget>
+  <customwidget>
+   <class>QDirectoryEdit</class>
+   <extends>QLineEdit</extends>
+   <header>dcc/ui/qdirectoryedit.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
-  <include location="D:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc"/>
+  <include location="E:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1,4 +1,5 @@
 import os
+import time
 import weakref
 
 from dcc import fnscene
@@ -12,6 +13,16 @@ import logging
 logging.basicConfig()
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
+
+
+def nullCallback(*args, **kwargs):
+    """
+    Placeholder for the execution callbacks.
+
+    :rtype: None
+    """
+
+    pass
 
 
 class TaskManager(psonobject.PSONObject):
@@ -116,7 +127,7 @@ class TaskManager(psonobject.PSONObject):
     # endregion
 
     # region Methods
-    def execute(self, *filePaths, callback=None, checkout=False):
+    def execute(self, *filePaths, checkout=False, preCallback=nullCallback, postCallback=nullCallback):
         """
         Executes the internal tasks on the supplied files.
         An additional callback can be supplied if an external class requires progress updates.
@@ -124,14 +135,16 @@ class TaskManager(psonobject.PSONObject):
 
         :type filePaths: Union[str, List[str]]
         :type checkout: bool
-        :type callback: Callable
+        :type preCallback: Callable
+        :type postCallback: Callable
         :rtype: None
         """
 
         # Iterate through files
         #
         numFilePaths = len(filePaths)
-        results = None
+        progress = 0.0
+        startTime = time.time()
 
         for (i, filePath) in enumerate(filePaths):
 
@@ -139,38 +152,45 @@ class TaskManager(psonobject.PSONObject):
             #
             self._currentFile = filePath
 
-            if not os.path.exists(self.currentFile):
+            if not os.path.exists(filePath):
 
-                log.warning('Cannot locate file: %s' % self.currentFile)
+                log.warning('Cannot locate file: %s' % filePath)
                 continue
 
             # Check if scene can be opened
             #
-            if self.scene.isValidExtension(self.currentFile):
+            preCallback(filePath=filePath, progress=progress)
 
-                self.scene.open(self.currentFile)
+            if self.scene.isValidExtension(filePath):
 
-            # Check if scene should be checked out
+                self.scene.open(filePath)
+
+            # Check if file should be checked out
             #
             if checkout:
 
-                cmds.edit(self.currentFile)
+                cmds.edit(filePath)
 
-            # Execute tasks
+            # Execute tasks on current file
             #
-            results = self.currentFile
+            results = filePath
 
             for task in self.tasks:
 
                 self._currentTask = task
-                results = self.currentTask.doIt(results, taskManager=self)
+                results = task.doIt(results, taskManager=self)
 
-            # Evoke callback
+            # Update progress
             #
-            if callable(callback):
+            progress = (float(i + 1) / float(numFilePaths)) * 100.0
+            postCallback(filePath=filePath, progress=progress)
 
-                progress = (float(i) / float(numFilePaths - 1)) * 100.0
-                callback(filePath=filePath, progress=progress)
+        # Notify user of time taken
+        #
+        endTime = time.time()
+        timeDelta = endTime - startTime
+
+        log.info('%s file(s) batched in %s!' % (numFilePaths, time.strftime('%H hours %M minutes and %S seconds', time.gmtime(timeDelta))))
     # endregion
 
     # region Callbacks

@@ -1,11 +1,14 @@
 import os
+import sys
+import json
 import webbrowser
 
 from Qt import QtCore, QtWidgets, QtGui
 from dcc import fnscene
 from dcc.json import jsonutils
 from dcc.ui import quicwindow
-from dcc.ui.models import qfileitemmodel, qfileexploreritemmodel, qpsonitemmodel, qpsonstyleditemdelegate
+from dcc.ui.models import qfileitemmodel, qfileexploreritemmodel, qfileitemfiltermodel
+from dcc.ui.models import qpsonitemmodel, qpsonstyleditemdelegate
 from dcc.generators.consecutivepairs import consecutivePairs
 from ..libs import taskmanager, taskfactory
 
@@ -20,7 +23,10 @@ class QEzBatcher(quicwindow.QUicWindow):
     Overload of QUicWindow that interfaces with the task manager framework.
     """
 
+    # region Signals
     cwdChanged = QtCore.Signal(str)
+    checkoutChanged = QtCore.Signal(bool)
+    # endregion
 
     # region Dunderscores
     def __init__(self, *args, **kwargs):
@@ -38,16 +44,20 @@ class QEzBatcher(quicwindow.QUicWindow):
         self._taskFactory = taskfactory.TaskFactory.getInstance(asWeakReference=True)
         self._taskConstructor = None
         self._scene = fnscene.FnScene()
+        self._cwd = ''
+        self._checkout = False
         self._currentFilePath = ''
 
         # Declare public variables
         #
         self.explorerItemModel = None
+        self.explorerItemFilterModel = None
         self.queueItemModel = None
         self.taskItemModel = None
         self.taskStyledItemDelegate = None
         self.taskMenu = None
         self.taskActionGroup = None
+        self.assumeSceneDirectoryAction = None
 
         # Call parent method
         #
@@ -116,6 +126,54 @@ class QEzBatcher(quicwindow.QUicWindow):
         """
 
         return self._currentFilePath
+
+    @property
+    def cwd(self):
+        """
+        Getter method that returns the current working directory.
+
+        :rtype: str
+        """
+
+        return self._cwd
+
+    @cwd.setter
+    def cwd(self, cwd):
+        """
+        Setter method that updates the current working directory.
+
+        :type cwd: str
+        :rtype: None
+        """
+
+        if os.path.isdir(cwd) and not self.isSameFile(cwd, self._cwd):
+
+            self._cwd = os.path.normpath(os.path.expandvars(cwd))
+            self.cwdChanged.emit(self.cwd)
+
+    @property
+    def checkout(self):
+        """
+        Getter method that returns the "checkout" flag.
+
+        :rtype: bool
+        """
+
+        return self._checkout
+
+    @checkout.setter
+    def checkout(self, checkout):
+        """
+        Setter method that updates the "checkout" flag.
+
+        :type checkout: bool
+        :rtype: None
+        """
+
+        if checkout != self._checkout:
+
+            self._checkout = checkout
+            self.checkoutChanged.emit(self._checkout)
     # endregion
 
     # region Methods
@@ -135,10 +193,12 @@ class QEzBatcher(quicwindow.QUicWindow):
         self.explorerItemModel = qfileexploreritemmodel.QFileExplorerItemModel(parent=self)
         self.explorerItemModel.setObjectName('explorerItemModel')
 
-        self.cwdLineEdit.textChanged.connect(self.explorerItemModel.setCwd)
-        self.cwdLineEdit.setText(self.scene.currentProjectDirectory())
+        self.explorerItemFilterModel = qfileitemfiltermodel.QFileItemFilterModel(parent=self)
+        self.explorerItemFilterModel.setObjectName('explorerItemFilterModel')
+        self.explorerItemFilterModel.setSourceModel(self.explorerItemModel)
 
-        self.explorerTreeView.setModel(self.explorerItemModel)
+        self.explorerFilterLineEdit.textChanged.connect(self.explorerItemFilterModel.setFilterWildcard)
+        self.explorerTreeView.setModel(self.explorerItemFilterModel)
 
         # Initialize queue item model
         #
@@ -192,64 +252,56 @@ class QEzBatcher(quicwindow.QUicWindow):
 
         self.addTaskDropDownButton.setMenu(self.taskMenu)
 
-    def eventFilter(self, watched, event):
-        """
-        Filters events if this object has been installed as an event filter for the watched object.
-        If you want to filter the event out, i.e. stop it being handled further, return true; otherwise return false.
-
-        :type watched: QtWidgets.QWidget
-        :type event: QtCore.QEvent
-        :rtype: bool
-        """
-
-        # Inspect event type
+        # Initialize CWD line edit
         #
-        if event.type() == QtCore.QEvent.KeyPress:
+        fileIconProvider = QtWidgets.QFileIconProvider()
+        icon = fileIconProvider.icon(os.path.normpath(sys.executable))
 
-            # Check if delete key was pressed
-            #
-            if event.key() not in (QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Delete):
+        self.assumeSceneDirectoryAction = QtWidgets.QAction(icon, '', parent=self)
+        self.assumeSceneDirectoryAction.setToolTip('Set directory to current scene.')
+        self.assumeSceneDirectoryAction.triggered.connect(self.on_assumeSceneDirectoryAction_triggered)
 
-                return False
+        self.cwdLineEdit.addAction(self.assumeSceneDirectoryAction, QtWidgets.QLineEdit.TrailingPosition)
 
-            # Check which widget triggered the event
-            #
-            if watched is self.queueTableView:
+        # Connect property signals
+        #
+        self.cwdChanged.connect(self.cwdLineEdit.setText)
+        self.cwdChanged.connect(self.explorerItemModel.setCwd)
+        self.cwd = self.scene.currentProjectDirectory()
 
-                self.removeSelectedFiles()
+        self.checkoutChanged.connect(self.checkoutCheckBox.setChecked)
 
-            elif watched is self.taskTreeView:
-
-                self.removeSelectedTasks()
-
-            else:
-
-                pass
-
-            return True
-
-        else:
-
-            return False
-
-    def cwd(self):
+    def loadSettings(self):
         """
-        Returns the current working directory.
+        Loads the user settings.
 
-        :rtype: str
-        """
-
-        return self.cwdLineEdit.text()
-
-    def setCwd(self, cwd):
-        """
-        Updates the current working directory.
-
-        :type cwd: str
         :rtype: None
         """
 
-        self.cwdLineEdit.setText(cwd)
+        # Call parent method
+        #
+        super(QEzBatcher, self).loadSettings()
+
+        # Load user preferences
+        #
+        self.cwd = self.settings.value('editor/cwd', defaultValue=self.scene.currentProjectDirectory())
+        self.checkout = bool(self.settings.value('editor/checkout', defaultValue=0))
+
+    def saveSettings(self):
+        """
+        Saves the user settings.
+
+        :rtype: None
+        """
+
+        # Call parent method
+        #
+        super(QEzBatcher, self).saveSettings()
+
+        # Save user preferences
+        #
+        self.settings.setValue('editor/cwd', self.cwd)
+        self.settings.setValue('editor/checkout', int(self.checkout))
 
     def newFile(self):
         """
@@ -280,8 +332,25 @@ class QEzBatcher(quicwindow.QUicWindow):
         :rtype: None
         """
 
-        jsonutils.dump(filePath, taskManager)
+        jsonutils.dump(filePath, taskManager, indent=4)
         self._currentFilePath = filePath
+
+    def isSameFile(self, path, otherPath):
+        """
+        Evaluates if the two supplied files are the same.
+
+        :type path: str
+        :type otherPath: str
+        :rtype: bool
+        """
+
+        try:
+
+            return os.path.samefile(path, otherPath)
+
+        except FileNotFoundError:
+
+            return False
 
     def removeSelectedFiles(self):
         """
@@ -325,9 +394,70 @@ class QEzBatcher(quicwindow.QUicWindow):
             self.taskItemModel.removeRows(0, numTasks)
 
     def updateProgressBar(self, filePath='', progress=0.0):
+        """
+        Updates the progressbar based on the supplied parameters.
 
-        self.progressBar.setText(filePath)
+        :type filePath: str
+        :type progress: float
+        :rtype: None
+        """
+
+        # Update progress bar format
+        #
+        if not self.scene.isNullOrEmpty(filePath):
+
+            text = '{filename} - %p%'.format(filename=os.path.basename(filePath))
+            self.progressBar.setFormat(text)
+
+        else:
+
+            self.progressBar.setFormat('%p%')
+
+        # Update progress value
+        #
         self.progressBar.setValue(progress)
+    # endregion
+
+    # region Events
+    def eventFilter(self, watched, event):
+        """
+        Filters events if this object has been installed as an event filter for the watched object.
+        If you want to filter the event out, i.e. stop it being handled further, return true; otherwise return false.
+
+        :type watched: QtWidgets.QWidget
+        :type event: QtCore.QEvent
+        :rtype: bool
+        """
+
+        # Inspect event type
+        #
+        if event.type() == QtCore.QEvent.KeyPress:
+
+            # Check if delete key was pressed
+            #
+            if event.key() not in (QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Delete):
+
+                return False
+
+            # Check which widget triggered the event
+            #
+            if watched is self.queueTableView:
+
+                self.removeSelectedFiles()
+
+            elif watched is self.taskTreeView:
+
+                self.removeSelectedTasks()
+
+            else:
+
+                pass
+
+            return True
+
+        else:
+
+            return False
     # endregion
 
     # region Slots
@@ -353,16 +483,16 @@ class QEzBatcher(quicwindow.QUicWindow):
 
         # Prompt user for save path
         #
-        filePath = QtWidgets.QFileDialog.getOpenFileName(
+        filePath, selectedFilter = QtWidgets.QFileDialog.getOpenFileName(
             parent=self,
             caption='Open',
-            dir=self.cwd(),
+            dir=self.cwd,
             filter='JSON (*.json)'
         )
 
         # Check if path is valid
         #
-        if os.path.exists(filePath) and os.path.isfile(filePath):
+        if os.path.isfile(filePath):
 
             self.openFile(filePath)
 
@@ -400,10 +530,10 @@ class QEzBatcher(quicwindow.QUicWindow):
 
         # Prompt user for save path
         #
-        savePath = QtWidgets.QFileDialog.getSaveFileName(
+        savePath, selectedFilter = QtWidgets.QFileDialog.getSaveFileName(
             parent=self,
             caption='Save As',
-            dir=self.cwd(),
+            dir=self.cwd,
             filter='JSON files (*.json)'
         )
 
@@ -429,33 +559,65 @@ class QEzBatcher(quicwindow.QUicWindow):
         webbrowser.open('https://github.com/bhsingleton/ezbatcher')
 
     @QtCore.Slot(bool)
-    def on_cwdPushButton_clicked(self, checked=False):
+    def on_assumeSceneDirectoryAction_triggered(self, checked=False):
         """
-        Slot method for the cwdPushButton's clicked signal.
+        Slot method for the assumeSceneDirectoryAction's triggered signal.
 
         :type checked: bool
         :rtype: None
         """
 
-        # Prompt user for current working directory
-        #
-        directory = QtWidgets.QFileDialog.getExistingDirectory(
-            parent=self,
-            caption='Select Current Working Directory',
-            dir=self.cwd(),
-            options=QtWidgets.QFileDialog.ShowDirsOnly
-        )
+        if not self.scene.isNewScene():
 
-        # Check if path is valid
-        # A null value will be returned if the user exited
-        #
-        if os.path.isdir(directory) and os.path.exists(directory):
+            self.cwd = self.scene.currentDirectory()
 
-            self.setCwd(directory)
+    @QtCore.Slot()
+    def on_cwdLineEdit_editingFinished(self):
+        """
+        Slot method for the cwdLineEdit's editingFinished signal.
+
+        :rtype: None
+        """
+
+        sender = self.sender()
+        text = sender.text()
+
+        if os.path.isdir(text):
+
+            self.cwd = text
 
         else:
 
-            log.info('Operation aborted.')
+            sender.setText(self.cwd)  # Revert changes
+
+    @QtCore.Slot(str)
+    def on_cwdLineEdit_programmaticallyChanged(self, text):
+        """
+        Slot method for the cwdLineEdit's programmaticallyChanged signal.
+
+        :type text: str
+        :rtype: None
+        """
+
+        sender = self.sender()
+
+        if os.path.isdir(text):
+
+            self.cwd = text
+
+        else:
+
+            sender.setText(self.cwd)  # Revert changes
+
+    @QtCore.Slot(bool)
+    def on_checkoutCheckBox_clicked(self, checked=False):
+        """
+        Slot method for the checkoutCheckBox's clicked signal.
+
+        :rtype: None
+        """
+
+        self.checkout = checked
 
     @QtCore.Slot(bool)
     def on_addTaskDropDownButton_clicked(self, checked=False):
@@ -530,6 +692,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         self.taskManager.execute(
             *filePaths,
             checkout=self.checkoutCheckBox.isChecked(),
-            callback=self.updateProgressBar
+            preCallback=self.updateProgressBar,
+            postCallback=self.updateProgressBar
         )
     # endregion
