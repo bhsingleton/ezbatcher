@@ -2,6 +2,7 @@ import os
 
 from dcc import fnscene
 from dcc.python import stringutils
+from dcc.ui import qdirectoryedit
 from .abstract import abstracttask
 
 import logging
@@ -125,6 +126,24 @@ class SaveSceneTask(abstracttask.AbstractTask):
     # endregion
 
     # region Methods
+    @classmethod
+    def createEditor(cls, name, parent=None):
+        """
+        Returns a Qt editor for the specified property.
+
+        :type name: str
+        :type parent: Union[QtWidgets.QWidget, None]
+        :rtype: Union[QtWidgets.QWidget, None]
+        """
+
+        if name == 'directory':
+
+            return qdirectoryedit.QDirectoryEdit(parent=parent)
+
+        else:
+
+            return super(SaveSceneTask, cls).createEditor(name, parent=parent)
+
     def doIt(self, *args, **kwargs):
         """
         Executes this task.

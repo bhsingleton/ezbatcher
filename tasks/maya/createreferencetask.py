@@ -3,6 +3,7 @@ import os
 from maya.api import OpenMaya as om
 from mpy import mpyfactory
 from dcc.python import stringutils
+from dcc.ui import qfileedit
 from ..abstract import abstracttask
 
 import logging
@@ -93,6 +94,24 @@ class CreateReferenceTask(abstracttask.AbstractTask):
     # endregion
 
     # region Methods
+    @classmethod
+    def createEditor(cls, name, parent=None):
+        """
+        Returns a Qt editor for the specified property.
+
+        :type name: str
+        :type parent: Union[QtWidgets.QWidget, None]
+        :rtype: Union[QtWidgets.QWidget, None]
+        """
+
+        if name == 'filePath':
+
+            return qfileedit.QFileEdit(filter='Maya Files (*.mb *.ma)', parent=parent)
+
+        else:
+
+            return super(CreateReferenceTask, cls).createEditor(name, parent=parent)
+
     def doIt(self, *args, **kwargs):
         """
         Executes this task.

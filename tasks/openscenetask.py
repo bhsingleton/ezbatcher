@@ -1,5 +1,6 @@
 import os
 
+from dcc.ui import qfileedit
 from .abstract import abstracttask
 
 import logging
@@ -79,6 +80,24 @@ class OpenSceneTask(abstracttask.AbstractTask):
     # endregion
 
     # region Methods
+    @classmethod
+    def createEditor(cls, name, parent=None):
+        """
+        Returns a Qt editor for the specified property.
+
+        :type name: str
+        :type parent: Union[QtWidgets.QWidget, None]
+        :rtype: Union[QtWidgets.QWidget, None]
+        """
+
+        if name == 'filePath':
+
+            return qfileedit.QFileEdit(parent=parent)
+
+        else:
+
+            return super(OpenSceneTask, cls).createEditor(name, parent=parent)
+
     def doIt(self, *args, **kwargs):
         """
         Executes this task.
