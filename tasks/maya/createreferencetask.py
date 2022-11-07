@@ -121,7 +121,9 @@ class CreateReferenceTask(abstracttask.AbstractTask):
 
         # Check if file exists
         #
-        if not os.path.exists(self.filePath):
+        absolutePath = os.path.normpath(os.path.expandvars(self.filePath))
+
+        if not os.path.exists(absolutePath):
 
             log.warning('Cannot locate scene file: %s' % self.filePath)
             return
