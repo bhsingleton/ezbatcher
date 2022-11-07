@@ -144,6 +144,17 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
             return super(SaveSceneTask, cls).createEditor(name, parent=parent)
 
+    @classmethod
+    def ensureDirectory(cls, filePath):
+        """
+        Ensures that the supplied directory exists.
+
+        :type filePath: str
+        :rtype: None
+        """
+
+        os.makedirs(filePath, exist_ok=True)
+
     def doIt(self, *args, **kwargs):
         """
         Executes this task.
@@ -196,5 +207,6 @@ class SaveSceneTask(abstracttask.AbstractTask):
         # Save changes to file
         #
         log.info('Saving changes to: %s' % filePath)
+        self.ensureDirectory(filePath)
         self.scene.saveAs(filePath)
     # endregion
