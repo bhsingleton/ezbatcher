@@ -16,8 +16,9 @@ class AbstractTask(with_metaclass(ABCMeta, psonobject.PSONObject)):
     """
 
     # region Dunderscores
-    __slots__ = ('_manager', '_scene')
+    __slots__ = ('_manager',)
     __title__ = ''
+    __scene__ = fnscene.FnScene()
 
     def __init__(self, *args, **kwargs):
         """
@@ -29,7 +30,6 @@ class AbstractTask(with_metaclass(ABCMeta, psonobject.PSONObject)):
         # Declare private methods
         #
         self._manager = self.nullWeakReference
-        self._scene = fnscene.FnScene()
 
         # Call parent method
         #
@@ -47,6 +47,16 @@ class AbstractTask(with_metaclass(ABCMeta, psonobject.PSONObject)):
 
         return cls.__title__
 
+    @classproperty
+    def scene(cls):
+        """
+        Getter method that returns the scene function set.
+
+        :rtype: fnscene.FnScene
+        """
+
+        return cls.__scene__
+
     @property
     def manager(self):
         """
@@ -56,16 +66,6 @@ class AbstractTask(with_metaclass(ABCMeta, psonobject.PSONObject)):
         """
 
         return self._manager()
-
-    @property
-    def scene(self):
-        """
-        Getter method that returns the scene function set.
-
-        :rtype: fnscene.FnScene
-        """
-
-        return self._scene
     # endregion
 
     # region Methods
