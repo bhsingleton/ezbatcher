@@ -32,7 +32,7 @@ class SaveSceneTask(abstracttask.AbstractTask):
         self._directory = kwargs.get('directory', '')
         self._search = kwargs.get('search', '')
         self._replace = kwargs.get('replace', '')
-        self._extension = kwargs.get('extension', fnscene.FnScene.FileExtensions(0))
+        self._extension = kwargs.get('extension', self.scene.FileExtensions(0))
 
         # Call parent method
         #
@@ -122,7 +122,7 @@ class SaveSceneTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        self._extension = fnscene.FnScene.FileExtensions(extension)
+        self._extension = self.scene.FileExtensions(extension)
     # endregion
 
     # region Methods
@@ -144,23 +144,20 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
             return super(SaveSceneTask, cls).createEditor(name, parent=parent)
 
-    @classmethod
-    def ensureDirectory(cls, filePath):
-        """
-        Ensures that the supplied directory exists.
-
-        :type filePath: str
-        :rtype: None
-        """
-
-        os.makedirs(filePath, exist_ok=True)
-
     def doIt(self, *args, **kwargs):
         """
         Executes this task.
 
         :rtype: None
         """
+
+        # Check if task manager exists
+        #
+        taskManager = kwargs.get('taskManager', None)
+
+        if taskManager is None:
+
+            raise TypeError('doIt() expects a valid task manager!')
 
         # Get directory and filename
         #
@@ -170,8 +167,6 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
             # Evaluate file from task manager
             #
-            taskManager = kwargs.get('taskManager', None)
-
             directory, filename = os.path.split(taskManager.currentFile)
             name, extension = os.path.splitext(filename)
 
@@ -207,6 +202,6 @@ class SaveSceneTask(abstracttask.AbstractTask):
         # Save changes to file
         #
         log.info('Saving changes to: %s' % filePath)
-        self.ensureDirectory(filePath)
+        self.scene.ensureDirectory(filePath)
         self.scene.saveAs(filePath)
     # endregion
