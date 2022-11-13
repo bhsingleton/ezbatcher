@@ -60,7 +60,7 @@ class OpenSceneTask(abstracttask.AbstractTask):
     @property
     def reopenCurrentFile(self):
         """
-        Getter method that returns the "reopenCurrentFile" flag.
+        Getter method that returns the `reopenCurrentFile` flag.
 
         :rtype: bool
         """
@@ -70,7 +70,7 @@ class OpenSceneTask(abstracttask.AbstractTask):
     @reopenCurrentFile.setter
     def reopenCurrentFile(self, reopenCurrentFile):
         """
-        Setter method that updates the "reopenCurrentFile" flag.
+        Setter method that updates the `reopenCurrentFile` flag.
 
         :type reopenCurrentFile: bool
         :rtype: None
@@ -105,10 +105,16 @@ class OpenSceneTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        # Check if current file should be reopened
+        # Check if task manager exists
         #
         taskManager = kwargs.get('taskManager', None)
 
+        if taskManager is None:
+
+            raise TypeError('doIt() expects a valid task manager!')
+
+        # Check if current file should be reopened
+        #
         if self.reopenCurrentFile:
 
             self.scene.open(taskManager.currentFile)
@@ -119,5 +125,5 @@ class OpenSceneTask(abstracttask.AbstractTask):
 
         else:
 
-            log.warning('Cannot locate scene file: %s' % self.filePath)
+            raise TypeError('doIt() Cannot locate scene file: %s' % self.filePath)
     # endregion
