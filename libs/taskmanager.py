@@ -123,6 +123,7 @@ class TaskManager(psonobject.PSONObject):
 
         :rtype: str
         """
+
         return self._currentFile
     # endregion
 
