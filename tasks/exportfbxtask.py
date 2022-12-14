@@ -16,7 +16,7 @@ class ExportFbxTask(abstracttask.AbstractTask):
     """
 
     # region Dunderscores
-    __slots__ = ('_manager', '_animationOnly', '_checkout')
+    __slots__ = ('_fbxIO', '_animationOnly', '_checkout')
     __title__ = 'Export Fbx'
 
     def __init__(self, *args, **kwargs):
@@ -28,7 +28,7 @@ class ExportFbxTask(abstracttask.AbstractTask):
 
         # Declare private variables
         #
-        self._manager = fbxio.FbxIO()
+        self._fbxIO = fbxio.FbxIO().weakReference()
         self._animationOnly = kwargs.get('animationOnly', True)
         self._checkout = kwargs.get('checkout', False)
 
@@ -39,14 +39,14 @@ class ExportFbxTask(abstracttask.AbstractTask):
 
     # region Properties
     @property
-    def manager(self):
+    def fbxIO(self):
         """
         Getter method that returns the fbx IO interface.
 
         :rtype: fbxio.FbxIO
         """
 
-        return self._manager
+        return self._fbxIO()
 
     @property
     def animationOnly(self):
@@ -102,7 +102,7 @@ class ExportFbxTask(abstracttask.AbstractTask):
 
         # Iterate through export sets
         #
-        asset = self.manager.loadAsset()
+        asset = self.fbxIO.loadAsset()
 
         for exportSet in asset.exportSets:
 
@@ -135,7 +135,7 @@ class ExportFbxTask(abstracttask.AbstractTask):
 
         # Iterate through sequencers
         #
-        sequencers = self.manager.loadSequencers()
+        sequencers = self.fbxIO.loadSequencers()
 
         for sequencer in sequencers:
 

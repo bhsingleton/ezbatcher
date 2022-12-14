@@ -16,7 +16,7 @@ class AbstractTask(with_metaclass(ABCMeta, psonobject.PSONObject)):
     """
 
     # region Dunderscores
-    __slots__ = ('_manager',)
+    __slots__ = ('_taskManager',)
     __title__ = ''
     __scene__ = fnscene.FnScene()
 
@@ -29,7 +29,7 @@ class AbstractTask(with_metaclass(ABCMeta, psonobject.PSONObject)):
 
         # Declare private methods
         #
-        self._manager = self.nullWeakReference
+        self._taskManager = self.nullWeakReference
 
         # Call parent method
         #
@@ -58,14 +58,14 @@ class AbstractTask(with_metaclass(ABCMeta, psonobject.PSONObject)):
         return cls.__scene__
 
     @property
-    def manager(self):
+    def taskManager(self):
         """
         Getter method that returns the associated task manager.
 
         :rtype: ezbatcher.libs.taskmanager.TaskManager
         """
 
-        return self._manager()
+        return self._taskManager()
     # endregion
 
     # region Methods

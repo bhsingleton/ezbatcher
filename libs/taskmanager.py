@@ -164,6 +164,7 @@ class TaskManager(psonobject.PSONObject):
 
             if self.scene.isValidExtension(filePath):
 
+                log.info('Opening scene file: %s' % filePath)
                 self.scene.open(filePath)
 
             # Check if file should be checked out
@@ -204,7 +205,7 @@ class TaskManager(psonobject.PSONObject):
         :rtype: None
         """
 
-        task._manager = weakref.ref(self)
+        task._taskManager = weakref.ref(self)
 
     def taskRemoved(self, task):
         """
@@ -214,5 +215,5 @@ class TaskManager(psonobject.PSONObject):
         :rtype: None
         """
 
-        task._manager = self.nullWeakReference
+        task._taskManager = self.nullWeakReference
     # endregion
