@@ -36,7 +36,19 @@ class TaskManager(psonobject.PSONObject):
     """
 
     # region Dunderscores
-    __slots__ = ('__weakref__', '_scene', '_tasks', '_factory', '_currentTask', '_currentFile')
+    __slots__ = (
+        '__weakref__',
+        '_scene',
+        '_tasks',
+        '_factory',
+        '_currentTask',
+        '_currentFilePath',
+        '_currentDirectory',
+        '_currentFilename',
+        '_currentName',
+        '_currentExtension',
+        '_currentIndex'
+    )
 
     def __init__(self, *args, **kwargs):
         """
@@ -50,8 +62,14 @@ class TaskManager(psonobject.PSONObject):
         self._scene = fnscene.FnScene()
         self._tasks = notifylist.NotifyList()
         self._factory = taskfactory.TaskFactory.getInstance(asWeakReference=True)
+
         self._currentTask = None
-        self._currentFile = None
+        self._currentFilePath = None
+        self._currentDirectory = None
+        self._currentFilename = None
+        self._currentName = None
+        self._currentExtension = None
+        self._currentIndex = None
 
         # Setup notifies
         #
@@ -117,14 +135,64 @@ class TaskManager(psonobject.PSONObject):
         return self._currentTask
 
     @property
-    def currentFile(self):
+    def currentFilePath(self):
         """
-        Getter method that returns the current file.
+        Getter method that returns the current file path.
 
         :rtype: str
         """
 
-        return self._currentFile
+        return self._currentFilePath
+
+    @property
+    def currentDirectory(self):
+        """
+        Getter method that returns the current directory.
+
+        :rtype: str
+        """
+
+        return self._currentDirectory
+
+    @property
+    def currentFilename(self):
+        """
+        Getter method that returns the current file name with extension.
+
+        :rtype: str
+        """
+
+        return self._currentFilename
+
+    @property
+    def currentName(self):
+        """
+        Getter method that returns the current file name.
+
+        :rtype: str
+        """
+
+        return self._currentName
+
+    @property
+    def currentExtension(self):
+        """
+        Getter method that returns the current file extension.
+
+        :rtype: str
+        """
+
+        return self._currentExtension
+
+    @property
+    def currentIndex(self):
+        """
+        Getter method that returns the current position in the queue.
+
+        :rtype: int
+        """
+
+        return self._currentIndex
     # endregion
 
     # region Methods
@@ -143,7 +211,7 @@ class TaskManager(psonobject.PSONObject):
 
         # Iterate through files
         #
-        numFilePaths = len(filePaths)
+        fileCount = len(filePaths)
         progress = 0.0
         startTime = time.time()
 
@@ -151,11 +219,15 @@ class TaskManager(psonobject.PSONObject):
 
             # Check if scene file exists
             #
-            self._currentFile = filePath
+            self._currentFilePath = os.path.abspath(filePath)
+            self._currentDirectory = os.path.dirname(self._currentFilePath)
+            self._currentFilename = os.path.basename(self._currentFilePath)
+            self._currentName, self._currentExtension = os.path.splitext(self._currentName)
+            self._currentIndex = i
 
             if not os.path.exists(filePath):
 
-                log.warning('Cannot locate file: %s' % filePath)
+                log.warning(f'Cannot locate file: {filePath}')
                 continue
 
             # Check if scene can be opened
@@ -164,7 +236,7 @@ class TaskManager(psonobject.PSONObject):
 
             if self.scene.isValidExtension(filePath):
 
-                log.info('Opening scene file: %s' % filePath)
+                log.info(f'Opening scene file: {filePath}')
                 self.scene.open(filePath)
 
             # Check if file should be checked out
@@ -184,7 +256,7 @@ class TaskManager(psonobject.PSONObject):
 
             # Update progress
             #
-            progress = (float(i + 1) / float(numFilePaths)) * 100.0
+            progress = (float(i + 1) / float(fileCount)) * 100.0
             postCallback(filePath=filePath, progress=progress)
 
         # Notify user of time taken
@@ -192,7 +264,7 @@ class TaskManager(psonobject.PSONObject):
         endTime = time.time()
         timeDelta = endTime - startTime
 
-        log.info('%s file(s) batched in %s!' % (numFilePaths, time.strftime('%H hours %M minutes and %S seconds', time.gmtime(timeDelta))))
+        log.info('%s file(s) batched in %s!' % (fileCount, time.strftime('%H hours %M minutes and %S seconds', time.gmtime(timeDelta))))
     # endregion
 
     # region Callbacks
