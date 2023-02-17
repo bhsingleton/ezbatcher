@@ -1,6 +1,6 @@
 import os
+import stat
 
-from dcc import fnscene
 from dcc.python import stringutils
 from dcc.ui import qdirectoryedit
 from .abstract import abstracttask
@@ -13,11 +13,11 @@ log.setLevel(logging.INFO)
 
 class SaveSceneTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that commits any changes made to the open scene file.
+    Overload of `AbstractTask` that commits any changes made to the open scene file.
     """
 
     # region Dunderscores
-    __slots__ = ('_directory', '_search', '_replace', '_extension')
+    __slots__ = ('_filename', '_directory', '_search', '_replace', '_extension')
     __title__ = 'Save Scene'
 
     def __init__(self, *args, **kwargs):
@@ -29,6 +29,7 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
         # Declare private variables
         #
+        self._filename = kwargs.get('filename', '')
         self._directory = kwargs.get('directory', '')
         self._search = kwargs.get('search', '')
         self._replace = kwargs.get('replace', '')
@@ -40,6 +41,27 @@ class SaveSceneTask(abstracttask.AbstractTask):
     # endregion
 
     # region Properties
+    @property
+    def filename(self):
+        """
+        Getter method that returns the name to save as.
+
+        :rtype: str
+        """
+
+        return self._filename
+
+    @filename.setter
+    def filename(self, filename):
+        """
+        Setter method that updates the name to save as.
+
+        :type filename: str
+        :rtype: None
+        """
+
+        self._filename = filename
+
     @property
     def directory(self):
         """
@@ -151,35 +173,36 @@ class SaveSceneTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        # Check if task manager exists
+        # Check if a directory was supplied
+        # If not, then use the current file's directory
         #
-        taskManager = kwargs.get('taskManager', None)
+        directory = None
 
-        if taskManager is None:
+        if not stringutils.isNullOrEmpty(self.directory):
 
-            raise TypeError('doIt() expects a valid task manager!')
-
-        # Get directory and filename
-        #
-        directory, filename = '', ''
-
-        if self.scene.isNewScene():
-
-            # Evaluate file from task manager
-            #
-            directory, filename = os.path.split(taskManager.currentFile)
-            name, extension = os.path.splitext(filename)
-
-            if not self.scene.isValidExtension(extension):
-
-                filename = '{name}.{extension}'.format(name=name, extension=self.extension.name)
+            directory = os.path.abspath(self.directory)
 
         else:
 
-            # Evaluate open scene file
-            #
-            directory = self.scene.currentDirectory()
-            filename = self.scene.currentFilename()
+            directory = self.taskManager.currentDirectory
+
+        # Check if a filename was supplied
+        # Again, if not, the use the current file's name
+        #
+        filename = None
+
+        if not stringutils.isNullOrEmpty(self.filename):
+
+            name = self.filename.format(name=self.taskManager.currentName, index=(self.taskManager.currentIndex + 1))
+            filename = f'{name}.{self.extension.name}'
+
+        elif self.scene.isValidExtension(self.taskManager.currentExtension):
+
+            filename = self.taskManager.currentFilename
+
+        else:
+
+            filename = f'{self.taskManager.currentName}.{self.extension.name}'
 
         # Check if a search and replace is required
         #
@@ -187,21 +210,27 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
             filename = filename.replace(self.search, self.replace)
 
-        # Check if a directory was supplied
+        # Save scene to specified path
         #
-        filePath = None
+        filePath = os.path.join(directory, filename)
+        log.info(f'Saving changes to: {filePath}')
 
-        if not stringutils.isNullOrEmpty(self.directory):
+        if os.path.exists(filePath):
 
-            filePath = os.path.join(self.directory, filename)
+            # Check if file is read-only
+            #
+            isWritable = os.access(filePath, os.W_OK)
+
+            if not isWritable:
+
+                os.chmod(filePath, stat.S_IWRITE)
+
+            self.scene.saveAs(filePath)
 
         else:
 
-            filePath = os.path.join(directory, filename)
-
-        # Save changes to file
-        #
-        log.info('Saving changes to: %s' % filePath)
-        self.scene.ensureDirectory(filePath)
-        self.scene.saveAs(filePath)
+            # Ensure directories exist and save file
+            #
+            self.scene.ensureDirectory(filePath)
+            self.scene.saveAs(filePath)
     # endregion
