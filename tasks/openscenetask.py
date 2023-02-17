@@ -11,7 +11,7 @@ log.setLevel(logging.INFO)
 
 class OpenSceneTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that opens a scene file.
+    Overload of `AbstractTask` that opens a scene file.
     """
 
     # region Dunderscores
@@ -105,19 +105,11 @@ class OpenSceneTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        # Check if task manager exists
-        #
-        taskManager = kwargs.get('taskManager', None)
-
-        if taskManager is None:
-
-            raise TypeError('doIt() expects a valid task manager!')
-
         # Check if current file should be reopened
         #
         if self.reopenCurrentFile:
 
-            self.scene.open(taskManager.currentFile)
+            self.scene.open(self.taskManager.currentFile)
 
         elif os.path.exists(self.filePath):
 
