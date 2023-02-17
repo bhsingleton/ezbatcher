@@ -47,6 +47,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         self._cwd = ''
         self._checkout = False
         self._currentFilePath = ''
+        self._currentFilename = ''
 
         # Declare public variables
         #
@@ -177,7 +178,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     # endregion
 
     # region Methods
-    def postLoad(self):
+    def postLoad(self, *args, **kwargs):
         """
         Called after the user interface has been loaded.
 
@@ -186,9 +187,9 @@ class QEzBatcher(quicwindow.QUicWindow):
 
         # Call parent method
         #
-        super(QEzBatcher, self).postLoad()
+        super(QEzBatcher, self).postLoad(*args, **kwargs)
 
-        # Initialize explorer item model
+        # Initialize file explorer item model
         #
         self.explorerItemModel = qfileexploreritemmodel.QFileExplorerItemModel(parent=self)
         self.explorerItemModel.setObjectName('explorerItemModel')
@@ -200,7 +201,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         self.explorerFilterLineEdit.textChanged.connect(self.explorerItemFilterModel.setFilterWildcard)
         self.explorerTreeView.setModel(self.explorerItemFilterModel)
 
-        # Initialize queue item model
+        # Initialize file queue item model
         #
         self.queueItemModel = qfileitemmodel.QFileItemModel(parent=self)
         self.queueItemModel.setObjectName('queueItemModel')
@@ -310,7 +311,16 @@ class QEzBatcher(quicwindow.QUicWindow):
         :rtype: None
         """
 
+        # Clear tasks
+        #
         self.clearTasks()
+
+        # Reset window title
+        #
+        self._currentFilePath = ''
+        self._currentFilename = ''
+
+        self.setWindowTitle('EzBatcher')
 
     def openFile(self, filePath):
         """
@@ -320,8 +330,16 @@ class QEzBatcher(quicwindow.QUicWindow):
         :rtype: None
         """
 
+        # Load task queue from file
+        #
         self.taskManager = jsonutils.load(filePath)
-        self._currentFilePath = filePath
+
+        # Update window title
+        #
+        self._currentFilePath = os.path.abspath(filePath)
+        self._currentFilename = os.path.basename(self._currentFilePath)
+
+        self.setWindowTitle(f'{self._currentFilename} - EzBatcher: {self._currentFilePath}')
 
     def saveFile(self, filePath, taskManager):
         """
@@ -332,8 +350,16 @@ class QEzBatcher(quicwindow.QUicWindow):
         :rtype: None
         """
 
+        # Dump task queue to file
+        #
         jsonutils.dump(filePath, taskManager, indent=4)
-        self._currentFilePath = filePath
+
+        # Update window title
+        #
+        self._currentFilePath = os.path.abspath(filePath)
+        self._currentFilename = os.path.basename(self._currentFilePath)
+
+        self.setWindowTitle(f'{self._currentFilename} - EzBatcher: {self._currentFilePath}')
 
     def isSameFile(self, path, otherPath):
         """
