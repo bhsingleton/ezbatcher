@@ -9,7 +9,7 @@ log.setLevel(logging.INFO)
 
 class UnloadTurtlePluginTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that unloads the turtle plugin from the open scene file.
+    Overload of `AbstractTask` that unloads the turtle plugin from the open scene file.
     """
 
     # region Dunderscores

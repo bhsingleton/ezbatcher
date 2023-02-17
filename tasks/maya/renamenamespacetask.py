@@ -9,7 +9,7 @@ log.setLevel(logging.INFO)
 
 class RenameNamespaceTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that renames a namespace from the scene file.
+    Overload of `AbstractTask` that renames a namespace from the scene file.
     """
 
     # region Dunderscores

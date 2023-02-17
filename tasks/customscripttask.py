@@ -11,7 +11,7 @@ log.setLevel(logging.INFO)
 
 class Language(IntEnum):
     """
-    Overload of IntEnum that lists all executable languages.
+    Enum class that lists all the executable languages.
     """
 
     Python = 0
@@ -20,7 +20,7 @@ class Language(IntEnum):
 
 class CustomScriptTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that executes a custom script.
+    Overload of `AbstractTask` that executes a custom script.
     """
 
     # region Dunderscores

@@ -9,7 +9,7 @@ log.setLevel(logging.INFO)
 
 class UnloadMentalRayPluginTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that unloads the MentalRay plugin from the open scene file.
+    Overload of `AbstractTask` that unloads the MentalRay plugin from the open scene file.
     """
 
     # region Dunderscores

@@ -12,7 +12,7 @@ log.setLevel(logging.INFO)
 
 class ExportFbxTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that exports animation from the scene file.
+    Overload of `AbstractTask` that exports animation from the scene file.
     """
 
     # region Dunderscores
