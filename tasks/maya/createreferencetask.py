@@ -1,7 +1,7 @@
 import os
 
+from maya import cmds as mc
 from maya.api import OpenMaya as om
-from mpy import mpyfactory
 from dcc.python import stringutils
 from dcc.ui import qfileedit
 from ..abstract import abstracttask
@@ -14,11 +14,11 @@ log.setLevel(logging.INFO)
 
 class CreateReferenceTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that creates a new scene reference.
+    Overload of `AbstractTask` that creates a new scene reference.
     """
 
     # region Dunderscores
-    __slots__ = ('_factory', '_filePath', '_namespace')
+    __slots__ = ('_filePath', '_namespace')
     __title__ = 'Create Reference'
 
     def __init__(self, *args, **kwargs):
@@ -30,7 +30,6 @@ class CreateReferenceTask(abstracttask.AbstractTask):
 
         # Declare private variables
         #
-        self._factory = mpyfactory.MPyFactory()
         self._filePath = kwargs.get('filePath', '')
         self._namespace = kwargs.get('namespace', '')
 
@@ -40,16 +39,6 @@ class CreateReferenceTask(abstracttask.AbstractTask):
     # endregion
 
     # region Properties
-    @property
-    def factory(self):
-        """
-        Getter method that returns the MPy factory interface.
-
-        :rtype: mpyfactory.MPyFactory
-        """
-
-        return self._factory
-
     @property
     def filePath(self):
         """
@@ -125,7 +114,7 @@ class CreateReferenceTask(abstracttask.AbstractTask):
 
         if not os.path.exists(absolutePath):
 
-            log.warning('Cannot locate scene file: %s' % self.filePath)
+            log.warning(f'Cannot locate scene file: {self.filePath}')
             return
 
         # Check if namespace is valid
@@ -139,9 +128,9 @@ class CreateReferenceTask(abstracttask.AbstractTask):
         #
         if not om.MNamespace.namespaceExists(self.namespace):
 
-            self.factory.createReference(self.filePath, self.namespace)
+            mc.file(self.filePath, reference=True, namespace=self.namespace)
 
         else:
 
-            log.info('Skipping reference since "%s" namespace already exists.' % self.namespace)
+            log.warning(f'Skipping reference since "{self.namespace}" namespace already exists.')
     # endregion
