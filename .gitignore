@@ -2,4 +2,4 @@
 *.pyc
 tasks/maya/importmxsontask.py
 tasks/max/exportmxsontask.py
-tasks/max/fixframe44lookatstask.py
+tasks/maya/fixframe44lookatstask.py
