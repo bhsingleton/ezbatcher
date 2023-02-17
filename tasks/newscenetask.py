@@ -12,11 +12,11 @@ log.setLevel(logging.INFO)
 
 class NewSceneTask(abstracttask.AbstractTask):
     """
-    Overload of AbstractTask that creates a new scene file.
+    Overload of `AbstractTask` that creates a new scene file.
     """
 
     # region Dunderscores
-    __slots__ = ('_filename', '_directory', '_extension', '_useCurrentFilename')
+    __slots__ = ('_filename', '_directory', '_extension')
     __title__ = 'New Scene'
 
     def __init__(self, *args, **kwargs):
@@ -31,7 +31,6 @@ class NewSceneTask(abstracttask.AbstractTask):
         self._filename = kwargs.get('filename', '')
         self._directory = kwargs.get('directory', '')
         self._extension = kwargs.get('extension', self.scene.FileExtensions(0))
-        self._useCurrentFilename = kwargs.get('useCurrentFilename', '')
 
         # Call parent method
         #
@@ -101,27 +100,6 @@ class NewSceneTask(abstracttask.AbstractTask):
         """
 
         self._extension = self.scene.FileExtensions(extension)
-
-    @property
-    def useCurrentFilename(self):
-        """
-        Getter method that returns the `useCurrentFilename` flag.
-
-        :rtype: bool
-        """
-
-        return self._useCurrentFilename
-
-    @useCurrentFilename.setter
-    def useCurrentFilename(self, useCurrentFilename):
-        """
-        Setter method that updates the `useCurrentFilename` flag.
-
-        :type useCurrentFilename: bool
-        :rtype: None
-        """
-
-        self._useCurrentFilename = useCurrentFilename
     # endregion
 
     # region Methods
@@ -154,14 +132,11 @@ class NewSceneTask(abstracttask.AbstractTask):
         #
         self.scene.new()
 
-        # Check if scene should be saved
+        # Check if new scene should be saved
         #
-        taskManager = kwargs.get('taskManager', None)
-        filename = os.path.basename(taskManager.currentFile) if self.useCurrentFilename else self.filename
+        if not self.scene.isNullOrEmpty(self.filename) and not self.scene.isNullOrEmpty(self.directory):
 
-        if not self.scene.isNullOrEmpty(filename) and not self.scene.isNullOrEmpty(self.directory):
-
-            name, extension = os.path.splitext(filename)
+            name = self.filename.format(name=self.taskManager.currentName, index=(self.taskManager.currentIndex + 1))
             filePath = os.path.join(self.directory, f'{name}.{self.extension.name}')
 
             self.scene.ensureDirectory(self.directory)
