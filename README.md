@@ -1,4 +1,4 @@
-# ezbatcher
+# EzBatcher
 A DCC agnostic python tool for batch editing scene files.  
 
 ## How to use
