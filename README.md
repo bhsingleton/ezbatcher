@@ -13,7 +13,7 @@ window.show()
 
 ## Interface
 The tool is broken down into 4 segments.  
-You're current working directory, the file explorer, the file queue and the tasks queue.  
+Your current working directory, the file explorer, the file queue and the task queue.  
 
 ![image](https://user-images.githubusercontent.com/11181168/219877927-8048f973-ed3d-4f22-a4a7-2278eeee8cce.png)
 
