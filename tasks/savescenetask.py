@@ -1,6 +1,7 @@
 import os
 import stat
 
+from dcc import fnscene
 from dcc.python import stringutils
 from dcc.ui import qdirectoryedit
 from .abstract import abstracttask
