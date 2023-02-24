@@ -197,6 +197,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         self.explorerItemFilterModel = qfileitemfiltermodel.QFileItemFilterModel(parent=self)
         self.explorerItemFilterModel.setObjectName('explorerItemFilterModel')
         self.explorerItemFilterModel.setSourceModel(self.explorerItemModel)
+        self.explorerItemFilterModel.setRecursiveFilteringEnabled(True)
 
         self.explorerFilterLineEdit.textChanged.connect(self.explorerItemFilterModel.setFilterWildcard)
         self.explorerTreeView.setModel(self.explorerItemFilterModel)
@@ -262,7 +263,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         self.assumeSceneDirectoryAction.setToolTip('Set directory to current scene.')
         self.assumeSceneDirectoryAction.triggered.connect(self.on_assumeSceneDirectoryAction_triggered)
 
-        self.cwdLineEdit.addAction(self.assumeSceneDirectoryAction, QtWidgets.QLineEdit.TrailingPosition)
+        self.cwdLineEdit.addAction(self.assumeSceneDirectoryAction, QtWidgets.QLineEdit.LeadingPosition)
 
         # Connect property signals
         #
@@ -490,7 +491,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_newAction_triggered(self, checked=False):
         """
-        Slot method for the newAction's triggered signal.
+        Slot method for the newAction's `triggered` signal.
 
         :type checked: bool
         :rtype: None
@@ -501,7 +502,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_openAction_triggered(self, checked=False):
         """
-        Slot method for the openAction's triggered signal.
+        Slot method for the openAction's `triggered` signal.
 
         :type checked: bool
         :rtype: None
@@ -529,7 +530,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_saveAction_triggered(self, checked=False):
         """
-        Slot method for the saveAction's triggered signal.
+        Slot method for the saveAction's `triggered` signal.
 
         :type checked: bool
         :rtype: None
@@ -548,7 +549,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_saveAsAction_triggered(self, checked=False):
         """
-        Slot method for the saveAsAction's triggered signal.
+        Slot method for the saveAsAction's `triggered` signal.
 
         :type checked: bool
         :rtype: None
@@ -576,7 +577,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_usingEzBatcherAction_triggered(self, checked=False):
         """
-        Slot method for the usingEzBatcherAction's triggered signal.
+        Slot method for the usingEzBatcherAction's `triggered` signal.
 
         :type checked: bool
         :rtype: None
@@ -587,7 +588,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_assumeSceneDirectoryAction_triggered(self, checked=False):
         """
-        Slot method for the assumeSceneDirectoryAction's triggered signal.
+        Slot method for the assumeSceneDirectoryAction's `triggered` signal.
 
         :type checked: bool
         :rtype: None
@@ -600,7 +601,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot()
     def on_cwdLineEdit_editingFinished(self):
         """
-        Slot method for the cwdLineEdit's editingFinished signal.
+        Slot method for the cwdLineEdit's `editingFinished` signal.
 
         :rtype: None
         """
@@ -617,9 +618,9 @@ class QEzBatcher(quicwindow.QUicWindow):
             sender.setText(self.cwd)  # Revert changes
 
     @QtCore.Slot(str)
-    def on_cwdLineEdit_programmaticallyChanged(self, text):
+    def on_cwdLineEdit_textChanged(self, text):
         """
-        Slot method for the cwdLineEdit's programmaticallyChanged signal.
+        Slot method for the cwdLineEdit's `textChanged` signal.
 
         :type text: str
         :rtype: None
@@ -638,7 +639,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_checkoutCheckBox_clicked(self, checked=False):
         """
-        Slot method for the checkoutCheckBox's clicked signal.
+        Slot method for the checkoutCheckBox's `clicked` signal.
 
         :rtype: None
         """
@@ -648,7 +649,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_addTaskDropDownButton_clicked(self, checked=False):
         """
-        Slot method for the addTaskDropDownButton's clicked signal.
+        Slot method for the addTaskDropDownButton's `clicked` signal.
 
         :type checked: bool
         :rtype: None
@@ -668,7 +669,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(QtWidgets.QAction)
     def on_taskActionGroup_triggered(self, action):
         """
-        Slot method for the taskActionGroup's triggered signal.
+        Slot method for the taskActionGroup's `triggered` signal.
 
         :type action: QtWidgets.QAction
         :rtype: None
@@ -686,7 +687,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_removeTaskPushButton_clicked(self, checked=False):
         """
-        Slot method for the removeTaskPushButton's clicked signal.
+        Slot method for the removeTaskPushButton's `clicked` signal.
 
         :type checked: bool
         :rtype: None
@@ -697,7 +698,7 @@ class QEzBatcher(quicwindow.QUicWindow):
     @QtCore.Slot(bool)
     def on_batchPushButton_clicked(self, checked=False):
         """
-        Slot method for the batchPushButton's clicked signal.
+        Slot method for the batchPushButton's `clicked` signal.
 
         :type checked: bool
         :rtype: None
