@@ -222,7 +222,7 @@ class TaskManager(psonobject.PSONObject):
             self._currentFilePath = os.path.abspath(filePath)
             self._currentDirectory = os.path.dirname(self._currentFilePath)
             self._currentFilename = os.path.basename(self._currentFilePath)
-            self._currentName, self._currentExtension = os.path.splitext(self._currentName)
+            self._currentName, self._currentExtension = os.path.splitext(self._currentFilename)
             self._currentIndex = i
 
             if not os.path.exists(filePath):
