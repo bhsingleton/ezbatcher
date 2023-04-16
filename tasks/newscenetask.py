@@ -134,10 +134,14 @@ class NewSceneTask(abstracttask.AbstractTask):
 
         # Check if new scene should be saved
         #
-        if not self.scene.isNullOrEmpty(self.filename) and not self.scene.isNullOrEmpty(self.directory):
+        hasFilename = not self.scene.isNullOrEmpty(self.filename)
+        hasDirectory = not self.scene.isNullOrEmpty(self.directory)
 
-            name = self.filename.format(name=self.taskManager.currentName, index=(self.taskManager.currentIndex + 1))
-            filePath = os.path.join(self.directory, f'{name}.{self.extension.name}')
+        if hasFilename or hasDirectory:
+
+            filename = self.filename.format(name=self.taskManager.currentName, index=(self.taskManager.currentIndex + 1)) if hasFilename else self.taskManager.currentName
+            directory = self.directory if hasDirectory else self.taskManager.currentDirectory
+            filePath = os.path.join(directory, f'{filename}.{self.extension.name}')
 
             self.scene.ensureDirectory(self.directory)
             self.scene.saveAs(filePath)
