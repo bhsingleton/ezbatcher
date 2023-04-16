@@ -185,10 +185,10 @@ class SaveSceneTask(abstracttask.AbstractTask):
 
         else:
 
-            directory = self.taskManager.currentDirectory
+            directory = self.scene.currentDirectory()
 
         # Check if a filename was supplied
-        # Again, if not, the use the current file's name
+        # Again, if not, then use the current file's name
         #
         filename = None
 
@@ -197,13 +197,9 @@ class SaveSceneTask(abstracttask.AbstractTask):
             name = self.filename.format(name=self.taskManager.currentName, index=(self.taskManager.currentIndex + 1))
             filename = f'{name}.{self.extension.name}'
 
-        elif self.scene.isValidExtension(self.taskManager.currentExtension):
-
-            filename = self.taskManager.currentFilename
-
         else:
 
-            filename = f'{self.taskManager.currentName}.{self.extension.name}'
+            filename = self.scene.currentFilename()
 
         # Check if a search and replace is required
         #
