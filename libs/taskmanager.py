@@ -5,7 +5,7 @@ import weakref
 from dcc import fnscene
 from dcc.collections import notifylist
 from dcc.json import psonobject
-from dcc.perforce import cmds
+from dcc.perforce import p4utils
 from . import taskfactory
 from ..tasks.abstract import abstracttask
 
@@ -212,6 +212,7 @@ class TaskManager(psonobject.PSONObject):
         # Iterate through files
         #
         fileCount = len(filePaths)
+
         progress = 0.0
         startTime = time.time()
 
@@ -243,7 +244,7 @@ class TaskManager(psonobject.PSONObject):
             #
             if checkout:
 
-                cmds.edit(filePath)
+                p4utils.tryCheckout(filePath)
 
             # Execute tasks on current file
             #
