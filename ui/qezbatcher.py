@@ -38,6 +38,10 @@ class QEzBatcher(quicwindow.QUicWindow):
         :rtype: None
         """
 
+        # Call parent method
+        #
+        super(QEzBatcher, self).__init__(*args, **kwargs)
+
         # Declare private variables
         #
         self._taskManager = taskmanager.TaskManager()
@@ -51,18 +55,42 @@ class QEzBatcher(quicwindow.QUicWindow):
 
         # Declare public variables
         #
+        self.fileMenu = None
+        self.newAction = None
+        self.openAction = None
+        self.saveAction = None
+        self.saveAsAction = None
+
+        self.helpMenu = None
+        self.usingEzBatcherAction = None
+
+        self.mainSplitter = None
+        self.fileWidget = None
+        self.cwdLineEdit = None
+        self.fileSplitter = None
+        self.explorerGroupBox = None
+        self.explorerFilterLineEdit = None
+        self.explorerTreeView = None
         self.explorerItemModel = None
         self.explorerItemFilterModel = None
+        self.queueGroupBox = None
+        self.queueTableView = None
         self.queueItemModel = None
+
+        self.taskGroupBox = None
+        self.taskTreeView = None
         self.taskItemModel = None
         self.taskStyledItemDelegate = None
-        self.taskMenu = None
-        self.taskActionGroup = None
-        self.assumeSceneDirectoryAction = None
+        self.buttonsWidget = None
+        self.addTaskDropDownButton = None
+        self.removeTaskPushButton = None
+        self.checkoutCheckBox = None
+        self.batchPushButton = None
+        self.progressBar = None
 
-        # Call parent method
-        #
-        super(QEzBatcher, self).__init__(*args, **kwargs)
+        self.taskMenu = None
+        self.assumeSceneDirectoryAction = None
+        self.taskActionGroup = None
     # endregion
 
     # region Properties
@@ -273,37 +301,39 @@ class QEzBatcher(quicwindow.QUicWindow):
 
         self.checkoutChanged.connect(self.checkoutCheckBox.setChecked)
 
-    def loadSettings(self):
+    def loadSettings(self, settings):
         """
         Loads the user settings.
 
+        :type settings: QtCore.QSettings
         :rtype: None
         """
 
         # Call parent method
         #
-        super(QEzBatcher, self).loadSettings()
+        super(QEzBatcher, self).loadSettings(settings)
 
         # Load user preferences
         #
-        self.cwd = self.settings.value('editor/cwd', defaultValue=self.scene.currentProjectDirectory())
-        self.checkout = bool(self.settings.value('editor/checkout', defaultValue=0))
+        self.cwd = settings.value('editor/cwd', defaultValue=self.scene.currentProjectDirectory())
+        self.checkout = bool(settings.value('editor/checkout', defaultValue=0))
 
-    def saveSettings(self):
+    def saveSettings(self, settings):
         """
         Saves the user settings.
 
+        :type settings: QtCore.QSettings
         :rtype: None
         """
 
         # Call parent method
         #
-        super(QEzBatcher, self).saveSettings()
+        super(QEzBatcher, self).saveSettings(settings)
 
         # Save user preferences
         #
-        self.settings.setValue('editor/cwd', self.cwd)
-        self.settings.setValue('editor/checkout', int(self.checkout))
+        settings.setValue('editor/cwd', self.cwd)
+        settings.setValue('editor/checkout', int(self.checkout))
 
     def newFile(self):
         """
@@ -598,6 +628,23 @@ class QEzBatcher(quicwindow.QUicWindow):
 
             self.cwd = self.scene.currentDirectory()
 
+    @QtCore.Slot(str)
+    def on_cwdLineEdit_textChanged(self, text):
+        """
+        Slot method for the cwdLineEdit's `textChanged` signal.
+
+        :type text: str
+        :rtype: None
+        """
+
+        if os.path.isdir(text):
+
+            self.cwd = text
+
+        else:
+
+            pass  # Let the `editingFinished` signal clean this up!
+
     @QtCore.Slot()
     def on_cwdLineEdit_editingFinished(self):
         """
@@ -617,24 +664,16 @@ class QEzBatcher(quicwindow.QUicWindow):
 
             sender.setText(self.cwd)  # Revert changes
 
-    @QtCore.Slot(str)
-    def on_cwdLineEdit_textChanged(self, text):
+    @QtCore.Slot()
+    def on_cwdLineEdit_returnPressed(self):
         """
-        Slot method for the cwdLineEdit's `textChanged` signal.
+        Slot method for the cwdLineEdit's `returnPressed` signal.
 
-        :type text: str
         :rtype: None
         """
 
         sender = self.sender()
-
-        if os.path.isdir(text):
-
-            self.cwd = text
-
-        else:
-
-            sender.setText(self.cwd)  # Revert changes
+        sender.clearFocus()
 
     @QtCore.Slot(bool)
     def on_checkoutCheckBox_clicked(self, checked=False):

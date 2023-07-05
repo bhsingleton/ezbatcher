@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mainWindow</class>
- <widget class="QMainWindow" name="mainWindow">
+ <class>QEzBatcher</class>
+ <widget class="QMainWindow" name="QEzBatcher">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -19,10 +19,10 @@
   <property name="windowTitle">
    <string>EzBatcher</string>
   </property>
-  <widget class="QWidget" name="centralWidget">
+  <widget class="QWidget" name="mainWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QSplitter" name="centralSplitter">
+     <widget class="QSplitter" name="mainSplitter">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -32,7 +32,7 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QWidget" name="filesWidget" native="true">
+      <widget class="QWidget" name="fileWidget" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -63,10 +63,13 @@
             <height>24</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>The current working directory.</string>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QSplitter" name="filesSplitter">
+         <widget class="QSplitter" name="fileSplitter">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -110,6 +113,9 @@
                 <height>24</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string>Filter files either by name or extension.</string>
+              </property>
               <property name="placeholderText">
                <string>Filter Files (ex. *.txt)</string>
               </property>
@@ -120,6 +126,9 @@
             </item>
             <item>
              <widget class="QTreeView" name="explorerTreeView">
+              <property name="toolTip">
+               <string>Drag files from here to populate the queue.</string>
+              </property>
               <property name="styleSheet">
                <string notr="true">QTreeView::item { height: 24px; }</string>
               </property>
@@ -191,6 +200,9 @@
               <property name="acceptDrops">
                <bool>true</bool>
               </property>
+              <property name="toolTip">
+               <string>Drop files into here to be batched.</string>
+              </property>
               <property name="styleSheet">
                <string notr="true">QTableView::item { height: 24px; }</string>
               </property>
@@ -241,7 +253,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QGroupBox" name="tasksGroupBox">
+      <widget class="QGroupBox" name="taskGroupBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -340,7 +352,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>Adds the specified task to the end of the list.</string>
+              <string>Adds the selected task to the end of the list.</string>
              </property>
              <property name="text">
               <string>Add</string>
@@ -409,7 +421,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>Checks out the processed files from perforce.</string>
+              <string>Checks out the files from the queue in perforce.</string>
              </property>
              <property name="text">
               <string>Checkout</string>
@@ -487,7 +499,7 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_File">
+   <widget class="QMenu" name="fileMenu">
     <property name="title">
      <string>&amp;File</string>
     </property>
@@ -497,14 +509,14 @@
     <addaction name="saveAction"/>
     <addaction name="saveAsAction"/>
    </widget>
-   <widget class="QMenu" name="menu_Help">
+   <widget class="QMenu" name="helpMenu">
     <property name="title">
      <string>&amp;Help</string>
     </property>
     <addaction name="usingEzBatcherAction"/>
    </widget>
-   <addaction name="menu_File"/>
-   <addaction name="menu_Help"/>
+   <addaction name="fileMenu"/>
+   <addaction name="helpMenu"/>
   </widget>
   <action name="usingEzBatcherAction">
    <property name="text">
@@ -513,7 +525,7 @@
   </action>
   <action name="saveAction">
    <property name="icon">
-    <iconset resource="E:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
+    <iconset resource="../../dcc/ui/resources.qrc">
      <normaloff>:/dcc/icons/save_file.svg</normaloff>:/dcc/icons/save_file.svg</iconset>
    </property>
    <property name="text">
@@ -527,7 +539,7 @@
   </action>
   <action name="openAction">
    <property name="icon">
-    <iconset resource="E:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
+    <iconset resource="../../dcc/ui/resources.qrc">
      <normaloff>:/dcc/icons/open_folder.svg</normaloff>:/dcc/icons/open_folder.svg</iconset>
    </property>
    <property name="text">
@@ -536,7 +548,7 @@
   </action>
   <action name="newAction">
    <property name="icon">
-    <iconset resource="E:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc">
+    <iconset resource="../../dcc/ui/resources.qrc">
      <normaloff>:/dcc/icons/new_file.svg</normaloff>:/dcc/icons/new_file.svg</iconset>
    </property>
    <property name="text">
@@ -557,7 +569,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="E:/_Wayfinder/AirshipCadet/tools/Python/dcc/ui/resources.qrc"/>
+  <include location="../../dcc/ui/resources.qrc"/>
  </resources>
  <connections/>
 </ui>
