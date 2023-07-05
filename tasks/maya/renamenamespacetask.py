@@ -1,4 +1,4 @@
-from maya import cmds
+from maya import cmds as mc
 from ..abstract import abstracttask
 
 import logging
@@ -13,7 +13,7 @@ class RenameNamespaceTask(abstracttask.AbstractTask):
     """
 
     # region Dunderscores
-    __slots__ = ()
+    __slots__ = ('_search', '_replace')
     __title__ = 'Rename Namespace'
 
     def __init__(self, *args, **kwargs):
@@ -86,11 +86,35 @@ class RenameNamespaceTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        searchExists = cmds.namespace(self.search, query=True, exists=True)
-        replaceExists = cmds.namespace(self.replace, query=True, exists=True)
+        # Check if namespace exists
+        #
+        searchExists = mc.namespace(exists=self.search)
 
-        if searchExists and not replaceExists:
+        if not searchExists:
 
-            log.info('Renaming "%s" namespace to "%s".' % (self.search, self.replace))
-            cmds.namespace(rename=(self.search, self.replace))
+            log.warning(f'Cannot locate namespace: {self.search}')
+            return
+
+        # Check for name collision
+        #
+        replaceExists = mc.namespace(exists=self.replace)
+
+        if replaceExists:
+
+            log.warning(f'Namespace already exists: {self.replace}')
+            return
+
+        # Update namespace and associated reference
+        #
+        log.info(f'Renaming namespace: "{self.search}" > "{self.replace}"')
+        mc.namespace(rename=(self.search, self.replace))
+
+        oldName = f'{self.search}RN'
+        newName = f'{self.replace}RN'
+
+        if mc.objExists(oldName):
+
+            mc.lockNode(oldName, lock=False)
+            mc.rename(oldName, newName)
+            mc.lockNode(newName, lock=True)
     # endregion
