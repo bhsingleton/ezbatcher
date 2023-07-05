@@ -141,123 +141,6 @@ class ExportFbxTask(abstracttask.AbstractTask):
 
             return super(ExportFbxTask, cls).createEditor(name, parent=parent)
 
-    def exportSets(self):
-        """
-        Exports all the export sets inside the current scene file.
-
-        :rtype: None
-        """
-
-        # Iterate through export sets
-        #
-        asset = self.fbxIO.loadAsset()
-
-        for exportSet in asset.exportSets:
-
-            # Check if sequence should be checked out
-            #
-            exportPath = exportSet.exportPath()
-
-            requiresAdding = self.checkout and not os.path.exists(exportPath)
-
-            if self.checkout and not requiresAdding:
-
-                cmds.edit(exportPath)
-
-            # Export asset
-            #
-            exportSet.export()
-
-            # Check if sequence should be added
-            #
-            if requiresAdding:
-
-                cmds.add(exportPath)
-
-    def exportReferencedAssets(self):
-        """
-        Tries to export any animation from referenced assets inside the current scene file.
-        This is done by checking if any of the reference nodes contains any export set data.
-        If no export set data is found then the referenced asset is ignored!
-
-        :rtype: None
-        """
-
-        # Check if scene contains any references
-        #
-        references = list(fnreference.FnReference.iterSceneReferences())
-        numReferences = len(references)
-
-        if numReferences == 0:
-
-            log.warning('Scene contains no referenced assets!')
-            return
-
-        # Collect references from scene
-        #
-        reference = fnreference.FnReference()
-        reference.setQueue(references)
-
-        while not reference.isDone():
-
-            # Initialize sequencer
-            #
-            name = self.scene.currentName()
-            directory = self.alternateDirectory if not stringutils.isNullOrEmpty(self.alternateDirectory) else 'Export'
-            sequence = fbxsequence.FbxSequence(name=name, directory=directory, useTimeline=True)
-
-            guid = reference.guid()
-            sequencer = fbxsequencer.FbxSequencer(guid=guid, sequences=[sequence])
-
-            if not sequencer.isValid():
-
-                log.warning(f'Cannot locate valid asset from reference: {guid}')
-                reference.next()
-
-                continue
-
-            # Export sequence
-            #
-            exportPath = sequence.export(checkout=self.checkout)
-
-            # Go to next reference
-            #
-            reference.next()
-
-    def exportSequences(self):
-        """
-        Exports all the sequences inside the current scene file.
-
-        :rtype: None
-        """
-
-        # Check if file contains any sequencers
-        #
-        sequencers = self.fbxIO.loadSequencers()
-        numSequencers = len(sequencers)
-
-        if numSequencers == 0:
-
-            self.exportReferencedAssets()
-
-        # Iterate through sequencers
-        #
-        for sequencer in sequencers:
-
-            # Iterate through sequences
-            #
-            for sequence in sequencer.sequences:
-
-                # Check if directory has been overriden
-                #
-                if not stringutils.isNullOrEmpty(self.alternateDirectory):
-
-                    sequence.directory = self.alternateDirectory
-
-                # Export sequence
-                #
-                exportPath = sequence.export(checkout=self.checkout)
-
     def doIt(self, *args, **kwargs):
         """
         Executes this task.
@@ -265,11 +148,14 @@ class ExportFbxTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
+        directory = kwargs.get('directory', '')
+        checkout = kwargs.get('checkout', False)
+
         if self.animationOnly:
 
-            self.exportSequences()
+            self.fbxIO.exportSequencers(directory=directory, checkout=checkout)
 
         else:
 
-            self.exportSets()
+            self.fbxIO.exportAsset(checkout=checkout)
     # endregion
