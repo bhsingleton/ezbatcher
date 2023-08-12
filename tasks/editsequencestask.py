@@ -1,5 +1,6 @@
 import os
 
+from fnmatch import fnmatch
 from dcc.fbx.libs import fbxio
 from dcc.python import stringutils
 from .abstract import abstracttask
@@ -16,7 +17,7 @@ class EditSequencesTask(abstracttask.AbstractTask):
     """
 
     # region Dunderscores
-    __slots__ = ('_fbxIO', '_search', '_replace', '_directory')
+    __slots__ = ('_fbxIO', '_search', '_replace', '_directory', '_resampleTimeRange', '_moveToOrigin', '_fileFilters')
     __title__ = 'Edit FBX Sequences'
 
     def __init__(self, *args, **kwargs):
@@ -32,6 +33,9 @@ class EditSequencesTask(abstracttask.AbstractTask):
         self._search = kwargs.get('search', '')
         self._replace = kwargs.get('replace', '')
         self._directory = kwargs.get('directory', '')
+        self._resampleTimeRange = kwargs.get('resampleTimeRange', False)
+        self._moveToOrigin = kwargs.get('moveToOrigin', False)
+        self._fileFilters = kwargs.get('fileFilters', [])
 
         # Call parent method
         #
@@ -111,9 +115,104 @@ class EditSequencesTask(abstracttask.AbstractTask):
         """
 
         self._directory = os.path.normpath(directory)
+
+    @property
+    def resampleTimeRange(self):
+        """
+        Getter method that returns the `resampleTimeRange` flag.
+
+        :rtype: bool
+        """
+
+        return self._resampleTimeRange
+
+    @resampleTimeRange.setter
+    def resampleTimeRange(self, resampleTimeRange):
+        """
+        Setter method that updates the `resampleTimeRange` flag.
+
+        :type resampleTimeRange: bool
+        :rtype: None
+        """
+
+        self._resampleTimeRange = resampleTimeRange
+
+    @property
+    def moveToOrigin(self):
+        """
+        Getter method that returns the `moveToOrigin` flag.
+
+        :rtype: bool
+        """
+
+        return self._moveToOrigin
+
+    @moveToOrigin.setter
+    def moveToOrigin(self, moveToOrigin):
+        """
+        Setter method that updates the `moveToOrigin` flag.
+
+        :type moveToOrigin: bool
+        :rtype: None
+        """
+
+        self._moveToOrigin = moveToOrigin
+
+    @property
+    def fileFilters(self):
+        """
+        Getter method that returns the file filters.
+
+        :rtype: List[str]
+        """
+
+        return self._fileFilters
+
+    @fileFilters.setter
+    def fileFilters(self, fileFilters):
+        """
+        Setter method that updates the file filter.
+
+        :type fileFilters: List[str]
+        :rtype: None
+        """
+
+        self._fileFilters.clear()
+        self._fileFilters.extend(fileFilters)
     # endregion
 
     # region Methods
+    def filterAccepts(self, sequencer):
+        """
+        Evaluates if the supplied sequencer is accepted.
+
+        :type sequencer: dcc.fbx.libs.fbxsequencer.FbxSequencer
+        :rtype: bool
+        """
+
+        # Check if sequencer is valid
+        #
+        isValid = sequencer.isValid()
+
+        if not isValid:
+
+            return False
+
+        # Check if there are any filters
+        #
+        numFilters = len(self.fileFilters)
+
+        if numFilters > 0:
+
+            filePath = sequencer.reference.filePath()
+            filename = os.path.basename(filePath)
+
+            return any([fnmatch(filename, pattern) for pattern in self.fileFilters])
+
+        else:
+
+            return True
+
     def doIt(self, *args, **kwargs):
         """
         Executes this task.
@@ -126,6 +225,14 @@ class EditSequencesTask(abstracttask.AbstractTask):
         sequencers = self.fbxIO.loadSequencers()
 
         for sequencer in sequencers:
+
+            # Check if sequencer is accepted
+            #
+            isAccepted = self.filterAccepts(sequencer)
+
+            if not isAccepted:
+
+                continue
 
             # Iterate through sequences
             #
@@ -142,6 +249,19 @@ class EditSequencesTask(abstracttask.AbstractTask):
                 if not stringutils.isNullOrEmpty(self.directory):
 
                     sequence.directory = self.directory
+
+                # Check if time-range requires resampling
+                #
+                if self.resampleTimeRange:
+
+                    sequence.startTime = self.scene.getStartTime()
+                    sequence.endTime = self.scene.getEndTime()
+
+                # Check if move-to-origin should be enabled
+                #
+                if self.moveToOrigin:
+
+                    sequence.moveToOrigin = True
 
         # Commit changes to sequencers
         #
