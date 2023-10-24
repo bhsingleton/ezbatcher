@@ -125,12 +125,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QTreeView" name="explorerTreeView">
+             <widget class="QTableView" name="explorerTableView">
               <property name="toolTip">
                <string>Drag files from here to populate the queue.</string>
               </property>
               <property name="styleSheet">
-               <string notr="true">QTreeView::item { height: 24px; }</string>
+               <string notr="true">QTableView::item { height: 24px; }</string>
               </property>
               <property name="verticalScrollBarPolicy">
                <enum>Qt::ScrollBarAlwaysOn</enum>
@@ -162,15 +162,27 @@
               <property name="selectionBehavior">
                <enum>QAbstractItemView::SelectRows</enum>
               </property>
-              <property name="uniformRowHeights">
-               <bool>true</bool>
-              </property>
-              <property name="animated">
-               <bool>true</bool>
-              </property>
-              <property name="expandsOnDoubleClick">
+              <property name="showGrid">
                <bool>false</bool>
               </property>
+              <attribute name="horizontalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderMinimumSectionSize">
+               <number>40</number>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderMinimumSectionSize">
+               <number>24</number>
+              </attribute>
+              <attribute name="verticalHeaderDefaultSectionSize">
+               <number>24</number>
+              </attribute>
              </widget>
             </item>
            </layout>

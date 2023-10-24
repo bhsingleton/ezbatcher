@@ -70,7 +70,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         self.fileSplitter = None
         self.explorerGroupBox = None
         self.explorerFilterLineEdit = None
-        self.explorerTreeView = None
+        self.explorerTableView = None
         self.explorerItemModel = None
         self.explorerItemFilterModel = None
         self.queueGroupBox = None
@@ -228,7 +228,7 @@ class QEzBatcher(quicwindow.QUicWindow):
         self.explorerItemFilterModel.setRecursiveFilteringEnabled(True)
 
         self.explorerFilterLineEdit.textChanged.connect(self.explorerItemFilterModel.setFilterWildcard)
-        self.explorerTreeView.setModel(self.explorerItemFilterModel)
+        self.explorerTableView.setModel(self.explorerItemFilterModel)
 
         # Initialize file queue item model
         #
@@ -674,6 +674,22 @@ class QEzBatcher(quicwindow.QUicWindow):
 
         sender = self.sender()
         sender.clearFocus()
+
+    @QtCore.Slot(QtCore.QModelIndex)
+    def on_explorerTableView_doubleClicked(self, index):
+        """
+        Slot method for the fileListView's `doubleClicked` signal.
+
+        :type index: QtCore.QModelIndex
+        :rtype: None
+        """
+
+        sourceIndex = self.explorerItemFilterModel.mapToSource(index)
+        path = self.explorerItemModel.pathFromIndex(sourceIndex)
+
+        if path.isDir():
+
+            self.cwd = str(path)
 
     @QtCore.Slot(bool)
     def on_checkoutCheckBox_clicked(self, checked=False):
