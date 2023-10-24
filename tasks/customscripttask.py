@@ -34,15 +34,15 @@ class CustomScriptTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
+        # Call parent method
+        #
+        super(CustomScriptTask, self).__init__(*args, **kwargs)
+
         # Declare private variables
         #
         self._filePath = kwargs.get('filePath', '')
         self._script = kwargs.get('script', '')
         self._language = kwargs.get('language', Language.Python)
-
-        # Call parent method
-        #
-        super(CustomScriptTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties

@@ -28,14 +28,14 @@ class CreateReferenceTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
+        # Call parent method
+        #
+        super(CreateReferenceTask, self).__init__(*args, **kwargs)
+
         # Declare private variables
         #
         self._filePath = kwargs.get('filePath', '')
         self._namespace = kwargs.get('namespace', '')
-
-        # Call parent method
-        #
-        super(CreateReferenceTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties

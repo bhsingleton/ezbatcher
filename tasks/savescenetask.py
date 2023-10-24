@@ -1,7 +1,6 @@
 import os
 import stat
 
-from dcc import fnscene
 from dcc.python import stringutils
 from dcc.ui import qdirectoryedit
 from .abstract import abstracttask
@@ -28,6 +27,10 @@ class SaveSceneTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
+        # Call parent method
+        #
+        super(SaveSceneTask, self).__init__(*args, **kwargs)
+
         # Declare private variables
         #
         self._filename = kwargs.get('filename', '')
@@ -35,10 +38,6 @@ class SaveSceneTask(abstracttask.AbstractTask):
         self._search = kwargs.get('search', '')
         self._replace = kwargs.get('replace', '')
         self._extension = kwargs.get('extension', self.scene.FileExtensions(0))
-
-        # Call parent method
-        #
-        super(SaveSceneTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties

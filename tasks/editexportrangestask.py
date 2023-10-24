@@ -11,14 +11,24 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 
-class EditSequencesTask(abstracttask.AbstractTask):
+class EditExportRangesTask(abstracttask.AbstractTask):
     """
-    Overload of `AbstractTask` that edits any sequences from the scene file.
+    Overload of `AbstractTask` that edits any export-ranges from the scene file.
     """
 
     # region Dunderscores
-    __slots__ = ('_fbxIO', '_search', '_replace', '_directory', '_resampleTimeRange', '_moveToOrigin', '_fileFilters')
-    __title__ = 'Edit FBX Sequences'
+    __slots__ = (
+        '_fbxIO',
+        '_search',
+        '_replace',
+        '_directory',
+        '_resampleTimeRange',
+        '_moveToOrigin',
+        '_removeRedundancies',
+        '_fileFilters',
+
+    )
+    __title__ = 'Edit FBX Export Ranges'
 
     def __init__(self, *args, **kwargs):
         """
@@ -26,6 +36,10 @@ class EditSequencesTask(abstracttask.AbstractTask):
 
         :rtype: None
         """
+
+        # Call parent method
+        #
+        super(EditExportRangesTask, self).__init__(*args, **kwargs)
 
         # Declare private variables
         #
@@ -35,11 +49,8 @@ class EditSequencesTask(abstracttask.AbstractTask):
         self._directory = kwargs.get('directory', '')
         self._resampleTimeRange = kwargs.get('resampleTimeRange', False)
         self._moveToOrigin = kwargs.get('moveToOrigin', False)
+        self._removeRedundancies = kwargs.get('removeRedundancies', False)
         self._fileFilters = kwargs.get('fileFilters', [])
-
-        # Call parent method
-        #
-        super(EditSequencesTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties
@@ -159,6 +170,27 @@ class EditSequencesTask(abstracttask.AbstractTask):
         self._moveToOrigin = moveToOrigin
 
     @property
+    def removeRedundancies(self):
+        """
+        Getter method that returns the `removeRedundancies` flag.
+
+        :rtype: bool
+        """
+
+        return self._removeRedundancies
+
+    @removeRedundancies.setter
+    def removeRedundancies(self, removeRedundancies):
+        """
+        Setter method that updates the `removeRedundancies` flag.
+
+        :type removeRedundancies: bool
+        :rtype: None
+        """
+
+        self._removeRedundancies = removeRedundancies
+
+    @property
     def fileFilters(self):
         """
         Getter method that returns the file filters.
@@ -220,10 +252,22 @@ class EditSequencesTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        # Iterate through sequencers
+        # Check for redundant sequencers
         #
         sequencers = self.fbxIO.loadSequencers()
+        numSequencers = len(sequencers)
 
+        if self.removeRedundancies and numSequencers == 1:
+
+            sequencer = sequencers[0]
+            numSequences = len(sequencer.exportRanges)
+
+            if not (numSequences >= 2):
+
+                sequencers.clear()
+
+        # Iterate through sequencers
+        #
         for sequencer in sequencers:
 
             # Check if sequencer is accepted
@@ -236,7 +280,7 @@ class EditSequencesTask(abstracttask.AbstractTask):
 
             # Iterate through sequences
             #
-            for sequence in sequencer.sequences:
+            for sequence in sequencer.exportRanges:
 
                 # Check if name requires changing
                 #

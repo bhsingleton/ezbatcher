@@ -23,14 +23,14 @@ class RenameNamespaceTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
+        # Call parent method
+        #
+        super(RenameNamespaceTask, self).__init__(*args, **kwargs)
+
         # Declare private variables
         #
         self._search = kwargs.get('search', '')
         self._replace = kwargs.get('replace', '')
-
-        # Call parent method
-        #
-        super(RenameNamespaceTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties

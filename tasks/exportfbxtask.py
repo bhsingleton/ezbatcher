@@ -1,10 +1,7 @@
 import os
 
-from dcc import fnreference
 from dcc.ui import qdirectoryedit
-from dcc.python import stringutils
-from dcc.perforce import cmds, p4utils
-from dcc.fbx.libs import fbxio, fbxsequencer, fbxsequence
+from dcc.fbx.libs import fbxio
 from .abstract import abstracttask
 
 import logging
@@ -35,16 +32,16 @@ class ExportFbxTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
+        # Call parent method
+        #
+        super(ExportFbxTask, self).__init__(*args, **kwargs)
+
         # Declare private variables
         #
         self._fbxIO = fbxio.FbxIO().weakReference()
         self._animationOnly = kwargs.get('animationOnly', True)
         self._alternateDirectory = kwargs.get('alternateDirectory', '')
         self._checkout = kwargs.get('checkout', False)
-
-        # Call parent method
-        #
-        super(ExportFbxTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties

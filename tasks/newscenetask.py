@@ -1,6 +1,5 @@
 import os
 
-from dcc import fnscene
 from dcc.ui import qdirectoryedit
 from .abstract import abstracttask
 
@@ -26,15 +25,15 @@ class NewSceneTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
+        # Call parent method
+        #
+        super(NewSceneTask, self).__init__(*args, **kwargs)
+
         # Declare private variables
         #
         self._filename = kwargs.get('filename', '')
         self._directory = kwargs.get('directory', '')
         self._extension = kwargs.get('extension', self.scene.FileExtensions(0))
-
-        # Call parent method
-        #
-        super(NewSceneTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties

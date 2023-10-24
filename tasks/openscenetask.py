@@ -25,14 +25,14 @@ class OpenSceneTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
+        # Call parent method
+        #
+        super(OpenSceneTask, self).__init__(*args, **kwargs)
+
         # Declare private variables
         #
         self._filePath = kwargs.get('filePath', '')
         self._reopenCurrentFile = kwargs.get('reopenCurrentFile', False)
-
-        # Call parent method
-        #
-        super(OpenSceneTask, self).__init__(*args, **kwargs)
     # endregion
 
     # region Properties
