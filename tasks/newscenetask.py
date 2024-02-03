@@ -1,5 +1,6 @@
 import os
 
+from dcc import fnscene
 from dcc.ui import qdirectoryedit
 from .abstract import abstracttask
 
@@ -84,7 +85,7 @@ class NewSceneTask(abstracttask.AbstractTask):
         """
         Getter method that returns the file extension to save with.
 
-        :rtype: fnscene.FnScene.FileExtensions
+        :rtype: fnscene.FnScene.__extensions__
         """
 
         return self._extension
@@ -94,7 +95,7 @@ class NewSceneTask(abstracttask.AbstractTask):
         """
         Setter method that updates the file extension to save with.
 
-        :type extension: fnscene.FnScene.FileExtensions
+        :type extension: fnscene.FnScene.__extensions__
         :rtype: None
         """
 
