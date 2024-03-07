@@ -1,8 +1,8 @@
-
 *.pyc
-tasks/maya/importmxsontask.py
 tasks/max/exportmxsontask.py
+tasks/maya/importmxsontask.py
 tasks/maya/fixframe44lookatstask.py
 tasks/maya/fixshieldorientationtask.py
+tasks/maya/fixreaverkingtask.py
 tasks/maya/fixstarfishtask.py
 tasks/maya/fixwurmtask.py
