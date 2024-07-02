@@ -1,4 +1,4 @@
-from dcc.maya.libs import sceneutils
+from dcc.maya.libs import pluginutils
 from ..abstract import abstracttask
 
 import logging
@@ -26,5 +26,5 @@ class UnloadTurtlePluginTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        sceneutils.unloadTurtlePlugin()
+        pluginutils.unloadTurtlePlugin()
     # endregion

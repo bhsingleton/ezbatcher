@@ -1,4 +1,4 @@
-from dcc.maya.libs import sceneutils
+from dcc.maya.libs import pluginutils
 from ..abstract import abstracttask
 
 import logging
@@ -25,5 +25,5 @@ class UnloadMentalRayPluginTask(abstracttask.AbstractTask):
         :rtype: None
         """
 
-        sceneutils.unloadMentalRayPlugin()
+        pluginutils.unloadMentalRayPlugin()
     # endregion
