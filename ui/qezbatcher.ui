@@ -344,7 +344,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QDropDownButton" name="addTaskDropDownButton">
+            <widget class="QDropDownButton" name="addTaskToolButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -368,6 +368,15 @@
              </property>
              <property name="text">
               <string>Add</string>
+             </property>
+             <property name="popupMode">
+              <enum>QToolButton::MenuButtonPopup</enum>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonTextOnly</enum>
+             </property>
+             <property name="arrowType">
+              <enum>Qt::DownArrow</enum>
              </property>
             </widget>
            </item>
@@ -570,14 +579,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QDropDownButton</class>
-   <extends>QPushButton</extends>
-   <header>dcc/ui/qdropdownbutton.h</header>
-  </customwidget>
-  <customwidget>
    <class>QDirectoryEdit</class>
    <extends>QLineEdit</extends>
    <header>dcc/ui/qdirectoryedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QDropDownButton</class>
+   <extends>QToolButton</extends>
+   <header>dcc/ui/qdropdownbutton.h</header>
   </customwidget>
  </customwidgets>
  <resources>
