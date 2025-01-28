@@ -1,4 +1,4 @@
-from dcc import __application__
+from dcc import __application__, DCC
 from dcc.abstract import proxyfactory
 from .. import tasks
 from ..tasks import maya, max
@@ -33,11 +33,11 @@ class TaskFactory(proxyfactory.ProxyFactory):
         :rtype: List[module]
         """
 
-        if __application__ == 'maya':
+        if __application__ == DCC.MAYA:
 
             return tasks, maya
 
-        elif __application__ == '3dsmax':
+        elif __application__ == DCC.MAX:
 
             return tasks, max
 
