@@ -137,9 +137,10 @@ class QEzBatcher(qsingletonwindow.QSingletonWindow):
         self.cwdLineEdit.editingFinished.connect(self.on_cwdLineEdit_editingFinished)
 
         fileIconProvider = QtWidgets.QFileIconProvider()
-        icon = fileIconProvider.icon(os.path.normpath(sys.executable))
+        fileInfo = QtCore.QFileInfo(os.path.normpath(sys.executable))
+        fileIcon = fileIconProvider.icon(fileInfo)
 
-        self.assumeSceneDirectoryAction = QtWidgets.QAction(icon, '', parent=self)
+        self.assumeSceneDirectoryAction = QtWidgets.QAction(fileIcon, '', parent=self)
         self.assumeSceneDirectoryAction.setToolTip('Set directory to current scene.')
         self.assumeSceneDirectoryAction.triggered.connect(self.on_assumeSceneDirectoryAction_triggered)
 
