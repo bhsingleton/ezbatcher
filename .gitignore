@@ -6,3 +6,5 @@ tasks/maya/fixshieldorientationtask.py
 tasks/maya/fixreaverkingtask.py
 tasks/maya/fixstarfishtask.py
 tasks/maya/fixwurmtask.py
+tasks/maya/repairwayfinderswordtask.py
+tasks/maya/retargetframe44task.py
