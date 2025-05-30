@@ -1,8 +1,9 @@
 import os
 
+from maya.api import OpenMaya as om
 from mpy import mpyscene
-from ezposer.libs import poseutils
 from dcc.ui import qfileedit, qdirectoryedit
+from ezposer.libs import poseutils
 from ..abstract import abstracttask
 
 import logging
